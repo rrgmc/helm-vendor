@@ -10,9 +10,9 @@ import (
 	"github.com/rrgmc/helm-vendor/internal/helm"
 )
 
-func (c *Cmd) VersionCheck(ctx context.Context) error {
+func (c *Cmd) CheckAll(ctx context.Context) error {
 	for _, chartConfig := range c.cfg.Charts {
-		err := c.printVersionCheck(ctx, chartConfig)
+		err := c.runCheckAll(ctx, chartConfig)
 		if err != nil {
 			fmt.Printf("error checking chart: %s\n", err)
 		}
@@ -20,7 +20,7 @@ func (c *Cmd) VersionCheck(ctx context.Context) error {
 	return nil
 }
 
-func (c *Cmd) printVersionCheck(ctx context.Context, chartConfig config.Chart) error {
+func (c *Cmd) runCheckAll(ctx context.Context, chartConfig config.Chart) error {
 	fmt.Printf("%s:\n", chartConfig.Path)
 
 	currentChartFilename := filepath.Join(c.buildChartPath(chartConfig), "Chart.yaml")

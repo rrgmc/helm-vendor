@@ -8,6 +8,7 @@ import (
 	"github.com/rrgmc/helm-vendor/internal/config"
 	"github.com/rrgmc/helm-vendor/internal/file"
 	"github.com/rrgmc/helm-vendor/internal/helm"
+	"helm.sh/helm/v3/pkg/repo"
 )
 
 func (c *Cmd) CheckAll(ctx context.Context) error {
@@ -21,28 +22,31 @@ func (c *Cmd) CheckAll(ctx context.Context) error {
 }
 
 func (c *Cmd) runCheckAll(ctx context.Context, chartConfig config.Chart) error {
-	fmt.Printf("- %s:", chartConfig.Path)
-
 	currentChartFilename := filepath.Join(c.buildChartPath(chartConfig), "Chart.yaml")
+	var currentChart *repo.ChartVersion
 	if file.Exists(currentChartFilename) {
-		currentChart, err := helm.LoadHelmChartVersionFile(currentChartFilename)
+		var err error
+		currentChart, err = helm.LoadHelmChartVersionFile(currentChartFilename)
 		if err != nil {
 			return fmt.Errorf("error loading chart file %s: %w\n", currentChartFilename, err)
 		}
+	}
+
+	repository, err := helm.LoadRepository(chartConfig.Repository.URL)
+	if err != nil {
+		return err
+	}
+
+	latestChart, err := repository.GetChart(chartConfig.Name, "")
+	if err != nil {
+		return err
+	}
+
+	fmt.Printf("- %s:", chartConfig.Path)
+	if currentChart != nil {
 		fmt.Printf(" [local:%s]", currentChart.Version)
 	}
-
-	repo, err := helm.LoadRepository(chartConfig.Repository.URL)
-	if err != nil {
-		return err
-	}
-
-	latestChart, err := repo.GetChart(chartConfig.Name, "")
-	if err != nil {
-		return err
-	}
 	fmt.Printf(" [latest:%s]", latestChart.Chart().Version)
-
 	fmt.Printf("\n")
 
 	return nil

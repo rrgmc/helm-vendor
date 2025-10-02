@@ -103,6 +103,9 @@ func (c *Cmd) upgradeChart(ctx context.Context, chartConfig config.Chart, versio
 			if err != nil {
 				return err
 			}
+
+			fmt.Printf("Writing diff file with changes between local and source chart\n")
+
 			err = os.WriteFile(diffFilename, diffBuilder.Bytes(), os.ModePerm)
 			if err != nil {
 				return err
@@ -110,6 +113,8 @@ func (c *Cmd) upgradeChart(ctx context.Context, chartConfig config.Chart, versio
 		}
 
 		// delete current files that exist in the chart
+		fmt.Printf("Removing local files which are contained in the source chart...\n")
+
 		for fi, err := range chartFileIter(sourceChartFiles.Iter()) {
 			if err != nil {
 				return err
@@ -125,6 +130,8 @@ func (c *Cmd) upgradeChart(ctx context.Context, chartConfig config.Chart, versio
 	}
 
 	// copy files from new chart
+	fmt.Printf("Copying files from new version...\n")
+
 	for fi, err := range chartFileIter(latestChartFiles.Iter()) {
 		if err != nil {
 			return err

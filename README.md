@@ -3,7 +3,7 @@
 `helm-vendor` is a command-line tool to manage vendoring of Kubernetes Helm Charts.
 
 Features:
-- config-file based list of charts to sync.
+- config-based list of charts to manage.
 - commands to download and upgrade charts automatically.
 - check for newer versions of installed charts.
 - when upgrading charts, the chart of the current version is downloaded, and only the files contained in it are deleted
@@ -13,7 +13,7 @@ Features:
 
 ## Example
 
-helm-vendor.yaml:
+**helm-vendor.yaml**:
 
 ```yaml
 charts:

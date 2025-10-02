@@ -101,7 +101,7 @@ func (c *Cmd) upgradeChart(ctx context.Context, chartConfig config.Chart, versio
 				filepath.Clean(fmt.Sprintf("helm-vendor-%s-%s", chartConfig.Path, currentChartVersionFile.Version)),
 				".diff")
 			if err != nil {
-				return err
+				return fmt.Errorf("error generating unique diff filename: %w", err)
 			}
 
 			fmt.Printf("Writing diff file with changes between local and source chart\n")
@@ -155,7 +155,7 @@ func (c *Cmd) upgradeChart(ctx context.Context, chartConfig config.Chart, versio
 		// apply patch to new files
 		patcher, err := diff.NewPatcher(diffBuilder.String())
 		if err != nil {
-			return err
+			return fmt.Errorf("error loading patch file: %w", err)
 		}
 
 		for filediff := range patcher.Files() {
@@ -201,7 +201,7 @@ func (c *Cmd) upgradeChart(ctx context.Context, chartConfig config.Chart, versio
 
 			err = os.WriteFile(targetFile, output.Bytes(), os.ModePerm)
 			if err != nil {
-				return err
+				return fmt.Errorf("error applying patch to %s: %w", filediff.NewName, err)
 			}
 		}
 	}

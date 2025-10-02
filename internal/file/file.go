@@ -69,13 +69,11 @@ func GenerateUniqueFilename(dir, baseName, extension string) (string, error) {
 
 		filePath := filepath.Join(dir, filename)
 
-		// Use os.OpenFile with os.O_EXCL to ensure atomic creation and check for existence
 		_, err := os.Stat(filePath)
 		if os.IsExist(err) {
 			continue // File exists, try next iteration
-		}
-		if err != nil {
-			return "", fmt.Errorf("failed to create file %s: %w", filePath, err)
+		} else if err != nil && !os.IsNotExist(err) {
+			return "", fmt.Errorf("failed to stat file %s: %w", filePath, err)
 		}
 		return filePath, nil // Success, return the path and the opened file
 	}

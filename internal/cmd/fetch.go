@@ -21,7 +21,6 @@ func (c *Cmd) Fetch(ctx context.Context, path string, version string) error {
 }
 
 func (c *Cmd) fetchChart(ctx context.Context, chartConfig config.Chart, version string) error {
-
 	chartOutputPath := c.buildChartPath(chartConfig)
 	currentChartFilename := filepath.Join(chartOutputPath, "Chart.yaml")
 	if file.Exists(currentChartFilename) {

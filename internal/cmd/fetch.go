@@ -73,7 +73,7 @@ func (c *Cmd) fetchChart(ctx context.Context, chartConfig config.Chart, version 
 			return err
 		}
 
-		err = file.CopyFileFS(chartFiles.Root(), chartRoot, fi.FullPath, targetFile)
+		err = file.CopyFileFS(chartFiles.Root(), chartRoot, fi.Path, targetFile)
 		if err != nil {
 			return err
 		}

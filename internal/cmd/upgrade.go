@@ -98,7 +98,7 @@ func (c *Cmd) upgradeChart(ctx context.Context, chartConfig config.Chart, versio
 			// localFile := filepath.Join(chartOutputPath, sourceChartFile.Path)
 			localFile := sourceChartFile.Path
 
-			err = diffBuilder.Add(sourceChartFile.Path, sourceChartFile.Path, sourceChartFiles.Root(), chartRoot, sourceChartFile.FullPath, localFile)
+			err = diffBuilder.Add(sourceChartFile.Path, sourceChartFile.Path, sourceChartFiles.Root(), chartRoot, sourceChartFile.Path, localFile)
 			if err != nil {
 				return err
 			}
@@ -131,7 +131,7 @@ func (c *Cmd) upgradeChart(ctx context.Context, chartConfig config.Chart, versio
 			if fi.Entry.IsDir() {
 				continue
 			}
-			err = chartRoot.Remove(fi.FullPath)
+			err = chartRoot.Remove(fi.Path)
 			if err != nil {
 				return err
 			}
@@ -155,7 +155,7 @@ func (c *Cmd) upgradeChart(ctx context.Context, chartConfig config.Chart, versio
 			return err
 		}
 
-		err = file.CopyFileFS(latestChartFiles.Root(), chartRoot, fi.FullPath, targetFile)
+		err = file.CopyFileFS(latestChartFiles.Root(), chartRoot, fi.Path, targetFile)
 		if err != nil {
 			return err
 		}

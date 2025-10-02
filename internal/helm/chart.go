@@ -72,11 +72,7 @@ func (c *Chart) Download(options ...ChartDownloadOption) (*ChartFiles, error) {
 	// 	return nil, fmt.Errorf("error removing chart temporary file: %w", err)
 	// }
 
-	return &ChartFiles{
-		chart:      c,
-		path:       optns.downloadPath,
-		isTempPath: isTempPath,
-	}, nil
+	return newChartFiles(c, optns.downloadPath, isTempPath)
 }
 
 func WithChartDownloadPath(path string) ChartDownloadOption {

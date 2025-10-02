@@ -15,7 +15,7 @@ type ChartFiles struct {
 }
 
 func newChartFiles(chart *Chart, path string, isTempPath bool) (*ChartFiles, error) {
-	chartRoot, err := os.OpenRoot(path)
+	chartRoot, err := os.OpenRoot(filepath.Join(path, filepath.Clean(chart.chart.Name)))
 	if err != nil {
 		return nil, err
 	}
@@ -33,7 +33,7 @@ func (c *ChartFiles) Root() *os.Root {
 
 func (c *ChartFiles) Iter() file.Iter {
 	// return file.IterDir(c.chartRoot.FS(), filepath.Join(c.path, filepath.Clean(c.chart.chart.Name)))
-	return file.IterDir(c.chartRoot.FS(), filepath.Clean(c.chart.chart.Name))
+	return file.IterDir(c.chartRoot.FS(), ".")
 }
 
 func (c *ChartFiles) Close() error {

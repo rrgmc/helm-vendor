@@ -8,9 +8,9 @@ import (
 )
 
 type Info struct {
-	Path     string
-	FullPath string
-	Entry    fs.DirEntry
+	Path string
+	// FullPath string
+	Entry fs.DirEntry
 }
 
 type Iter = iter.Seq2[Info, error]
@@ -18,7 +18,7 @@ type Iter = iter.Seq2[Info, error]
 func IterDir(fsys fs.FS, rootPath string) Iter {
 	errEnd := errors.New("end")
 	return func(yield func(Info, error) bool) {
-		err := fs.WalkDir(fsys, ".", func(path string, d fs.DirEntry, err error) error {
+		err := fs.WalkDir(fsys, rootPath, func(path string, d fs.DirEntry, err error) error {
 			if err != nil {
 				return err
 			}
@@ -26,9 +26,9 @@ func IterDir(fsys fs.FS, rootPath string) Iter {
 				return nil
 			}
 			fi := Info{
-				Path:     filepath.ToSlash(path),
-				FullPath: filepath.Join(rootPath, path),
-				Entry:    d,
+				Path: filepath.ToSlash(path),
+				// FullPath: filepath.Join(rootPath, path),
+				Entry: d,
 			}
 			if !yield(fi, nil) {
 				return errEnd

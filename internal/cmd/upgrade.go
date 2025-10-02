@@ -15,16 +15,16 @@ import (
 	"github.com/rrgmc/helm-vendor/internal/helm"
 )
 
-func (c *Cmd) Upgrade(ctx context.Context, path string, version string, ignoreLast bool, applyPatch bool) error {
+func (c *Cmd) Upgrade(ctx context.Context, path string, version string, ignoreCurrent bool, applyPatch bool) error {
 	for _, chartConfig := range c.cfg.Charts {
 		if path == chartConfig.Path {
-			return c.upgradeChart(ctx, chartConfig, version, ignoreLast, applyPatch)
+			return c.upgradeChart(ctx, chartConfig, version, ignoreCurrent, applyPatch)
 		}
 	}
 	return fmt.Errorf("unknown path '%s'", path)
 }
 
-func (c *Cmd) upgradeChart(ctx context.Context, chartConfig config.Chart, version string, ignoreLast bool, applyPatch bool) error {
+func (c *Cmd) upgradeChart(ctx context.Context, chartConfig config.Chart, version string, ignoreCurrent bool, applyPatch bool) error {
 	chartOutputPath := c.buildChartPath(chartConfig)
 	currentChartFilename := filepath.Join(chartOutputPath, "Chart.yaml")
 	if !file.Exists(currentChartFilename) {
@@ -62,9 +62,9 @@ func (c *Cmd) upgradeChart(ctx context.Context, chartConfig config.Chart, versio
 		})
 	}
 
-	diffBuilder := diff.NewBuilder(!ignoreLast)
+	diffBuilder := diff.NewBuilder(!ignoreCurrent)
 
-	if !ignoreLast {
+	if !ignoreCurrent {
 		fmt.Printf("Downloading source chart for local version [%s - %s]\n", currentChartVersionFile.Name, currentChartVersionFile.Version)
 
 		sourceChart, err := repo.GetChart(currentChartVersionFile.Name, currentChartVersionFile.Version)
@@ -151,7 +151,7 @@ func (c *Cmd) upgradeChart(ctx context.Context, chartConfig config.Chart, versio
 		}
 	}
 
-	if !ignoreLast && applyPatch && !diffBuilder.IsEmpty() {
+	if !ignoreCurrent && applyPatch && !diffBuilder.IsEmpty() {
 		// apply patch to new files
 		patcher, err := diff.NewPatcher(diffBuilder.String())
 		if err != nil {

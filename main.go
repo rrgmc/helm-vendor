@@ -69,6 +69,18 @@ func run(ctx context.Context) error {
 			},
 			{
 				Name: "upgrade",
+				Flags: []cli.Flag{
+					&cli.BoolFlag{
+						Name:  "ignore-current",
+						Usage: "ignore current release (just unpack the new version over it)",
+						Value: false,
+					},
+					&cli.BoolFlag{
+						Name:  "apply-patch",
+						Usage: "create a diff of the local version and the chart of the same version, and patch the new version with it",
+						Value: false,
+					},
+				},
 				Action: func(ctx context.Context, command *cli.Command) error {
 					if command.NArg() < 1 {
 						return errors.New("path name is required")
@@ -83,7 +95,7 @@ func run(ctx context.Context) error {
 						return err
 					}
 
-					return c.Upgrade(ctx, command.Args().First(), version, false, false)
+					return c.Upgrade(ctx, command.Args().First(), version, command.Bool("ignore-current"), command.Bool("apply-patch"))
 				},
 			},
 		},

@@ -40,6 +40,7 @@ func run(ctx context.Context) error {
 					if err != nil {
 						return err
 					}
+					defer c.Close()
 
 					if command.NArg() < 1 {
 						return c.CheckAll(ctx)
@@ -63,6 +64,7 @@ func run(ctx context.Context) error {
 					if err != nil {
 						return err
 					}
+					defer c.Close()
 
 					return c.Fetch(ctx, command.Args().First(), version)
 				},
@@ -94,6 +96,7 @@ func run(ctx context.Context) error {
 					if err != nil {
 						return err
 					}
+					defer c.Close()
 
 					return c.Upgrade(ctx, command.Args().First(), version, command.Bool("ignore-current"), command.Bool("apply-patch"))
 				},

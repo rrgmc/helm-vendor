@@ -1,0 +1,24 @@
+charts:
+  - path: opentelemetry-collector
+    repository:
+      url: https://open-telemetry.github.io/opentelemetry-helm-charts
+    name: opentelemetry-collector
+    files:
+      ignore:
+        - "ci/**"
+        - "examples/**"
+  - path: datadog
+    repository:
+      url: https://helm.datadoghq.com
+    name: datadog
+  - path: argo-cd
+    repository:
+      url: https://argoproj.github.io/argo-helm
+    name: argo-cd
+    files:
+      ignore:
+        - "charts/redis-ha/**"
+  - path: temporal-cluster
+    repository:
+      url: https://go.temporal.io/helm-charts/
+    name: temporal

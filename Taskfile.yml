@@ -4,6 +4,9 @@ tasks:
   doc:
     cmds:
       - 'go doc -http'
+  install:
+    cmds:
+      - 'go install github.com/rrgmc/helm-vendor'
   test:
     cmds:
       - 'go test ./...'

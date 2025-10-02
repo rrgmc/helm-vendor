@@ -99,7 +99,7 @@ func (c *Cmd) upgradeChart(ctx context.Context, chartConfig config.Chart, versio
 		if !diffBuilder.IsEmpty() {
 			diffFilename, err := file.GenerateUniqueFilename(chartOutputPath,
 				filepath.Clean(fmt.Sprintf("helm-vendor-%s-%s", chartConfig.Path, currentChartVersionFile.Version)),
-				"diff")
+				".diff")
 			if err != nil {
 				return err
 			}
@@ -175,7 +175,12 @@ func (c *Cmd) upgradeChart(ctx context.Context, chartConfig config.Chart, versio
 				var fconflict *gitdiff.Conflict
 				if errors.As(err, &fconflict) {
 					fmt.Printf("conflict applying patch to %s: %s\n", filediff.NewName, err)
-					conflictFileName := filepath.Join(chartOutputPath, file.NameExtFormat(filediff.NewName)+"_conflict.diff")
+
+					conflictFileName, err := file.GenerateUniqueFilename(filepath.Dir(targetFile),
+						file.NameExtFormat(filediff.NewName)+"_conflict", ".diff")
+					if err != nil {
+						return fmt.Errorf("error generating conflict file: %w", err)
+					}
 
 					if !file.Exists(conflictFileName) {
 						err = os.WriteFile(conflictFileName, []byte(filediff.String()), os.ModePerm)

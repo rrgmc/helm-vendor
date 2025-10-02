@@ -32,7 +32,7 @@ func (c *Cmd) checkChart(ctx context.Context, chartConfig config.Chart) error {
 	// currentChartFilename := filepath.Join(c.buildChartPath(chartConfig), "Chart.yaml")
 	currentChartFilename := "Chart.yaml"
 	var currentChart *repo.ChartVersion
-	if file.ExistsFS(chartRoot, currentChartFilename) {
+	if file.Exists(chartRoot, currentChartFilename) {
 		var err error
 		currentChart, err = helm.LoadHelmChartVersionFile(chartRoot, currentChartFilename)
 		if err != nil {

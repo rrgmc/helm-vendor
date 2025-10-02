@@ -30,7 +30,7 @@ func (c *Cmd) fetchChart(ctx context.Context, chartConfig config.Chart, version 
 	// chartOutputPath := c.buildChartPath(chartConfig)
 	// currentChartFilename := filepath.Join(chartOutputPath, "Chart.yaml")
 	currentChartFilename := "Chart.yaml"
-	if file.ExistsFS(chartRoot, currentChartFilename) {
+	if file.Exists(chartRoot, currentChartFilename) {
 		return fmt.Errorf("chart already exists in path '%s', use upgrade to download a newer version", chartConfig.Path)
 	}
 
@@ -73,7 +73,7 @@ func (c *Cmd) fetchChart(ctx context.Context, chartConfig config.Chart, version 
 			return err
 		}
 
-		err = file.CopyFileFS(chartFiles.Root(), chartRoot, fi.Path, targetFile)
+		err = file.CopyFile(chartFiles.Root(), chartRoot, fi.Path, targetFile)
 		if err != nil {
 			return err
 		}

@@ -27,14 +27,14 @@ func NameExtFormat(fileName string) string {
 	return fne
 }
 
-func CopyFileFS(srcFS, dstFS *os.Root, src, dst string) error {
-	sourceFile, err := srcFS.Open(src)
+func CopyFile(srcRoot, dstRoot *os.Root, src, dst string) error {
+	sourceFile, err := srcRoot.Open(src)
 	if err != nil {
 		return fmt.Errorf("failed to open source file: %w", err)
 	}
 	defer sourceFile.Close() // Ensure the source file is closed
 
-	destinationFile, err := dstFS.Create(dst)
+	destinationFile, err := dstRoot.Create(dst)
 	if err != nil {
 		return fmt.Errorf("failed to create destination file: %w", err)
 	}
@@ -48,8 +48,8 @@ func CopyFileFS(srcFS, dstFS *os.Root, src, dst string) error {
 	return nil
 }
 
-func ExistsFS(fsys *os.Root, filePath string) bool {
-	_, err := fsys.Stat(filePath)
+func Exists(root *os.Root, filePath string) bool {
+	_, err := root.Stat(filePath)
 	if err == nil {
 		return true
 	}
@@ -59,9 +59,9 @@ func ExistsFS(fsys *os.Root, filePath string) bool {
 	return false
 }
 
-// GenerateUniqueFilenameFS attempts to create a file with a unique name in the specified directory.
+// GenerateUniqueFilename attempts to create a file with a unique name in the specified directory.
 // It appends a counter to the base filename until a non-existent name is found and the file is created.
-func GenerateUniqueFilenameFS(fsys *os.Root, dir, baseName, extension string) (string, error) {
+func GenerateUniqueFilename(root *os.Root, dir, baseName, extension string) (string, error) {
 	for i := 0; i < 1000; i++ { // Limit retries to prevent infinite loops
 		var filename string
 		if i == 0 {
@@ -72,7 +72,7 @@ func GenerateUniqueFilenameFS(fsys *os.Root, dir, baseName, extension string) (s
 
 		filePath := path.Join(dir, filename)
 
-		_, err := fsys.Stat(filePath)
+		_, err := root.Stat(filePath)
 		if errors.Is(err, fs.ErrExist) {
 			continue // File exists, try next iteration
 		} else if err != nil && !errors.Is(err, fs.ErrNotExist) {

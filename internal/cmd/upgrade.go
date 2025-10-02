@@ -35,7 +35,7 @@ func (c *Cmd) upgradeChart(ctx context.Context, chartConfig config.Chart, versio
 	// chartOutputPath := c.buildChartPath(chartConfig)
 	// currentChartFilename := filepath.Join(chartOutputPath, "Chart.yaml")
 	currentChartFilename := "Chart.yaml"
-	if !file.ExistsFS(chartRoot, currentChartFilename) {
+	if !file.Exists(chartRoot, currentChartFilename) {
 		return fmt.Errorf("chart not found in path '%s', use fetch to download an initial version", chartConfig.Path)
 	}
 
@@ -106,7 +106,7 @@ func (c *Cmd) upgradeChart(ctx context.Context, chartConfig config.Chart, versio
 
 		// write diff
 		if !diffBuilder.IsEmpty() {
-			diffFilename, err := file.GenerateUniqueFilenameFS(chartRoot, ".",
+			diffFilename, err := file.GenerateUniqueFilename(chartRoot, ".",
 				filepath.Clean(fmt.Sprintf("helm-vendor-%s-%s", chartConfig.Path, currentChartVersionFile.Version)),
 				".diff")
 			if err != nil {
@@ -155,7 +155,7 @@ func (c *Cmd) upgradeChart(ctx context.Context, chartConfig config.Chart, versio
 			return err
 		}
 
-		err = file.CopyFileFS(latestChartFiles.Root(), chartRoot, fi.Path, targetFile)
+		err = file.CopyFile(latestChartFiles.Root(), chartRoot, fi.Path, targetFile)
 		if err != nil {
 			return err
 		}
@@ -187,13 +187,13 @@ func (c *Cmd) upgradeChart(ctx context.Context, chartConfig config.Chart, versio
 				if errors.As(err, &fconflict) {
 					fmt.Printf("conflict applying patch to %s: %s\n", filediff.NewName, err)
 
-					conflictFileName, err := file.GenerateUniqueFilenameFS(chartRoot, filepath.Dir(targetFile),
+					conflictFileName, err := file.GenerateUniqueFilename(chartRoot, filepath.Dir(targetFile),
 						file.NameExtFormat(filediff.NewName)+"_conflict", ".diff")
 					if err != nil {
 						return fmt.Errorf("error generating conflict file: %w", err)
 					}
 
-					if !file.ExistsFS(chartRoot, conflictFileName) {
+					if !file.Exists(chartRoot, conflictFileName) {
 						err = chartRoot.WriteFile(conflictFileName, []byte(filediff.String()), os.ModePerm)
 						if err != nil {
 							return err

@@ -68,6 +68,25 @@ func run(ctx context.Context) error {
 				},
 			},
 			{
+				Name: "upgrade",
+				Action: func(ctx context.Context, command *cli.Command) error {
+					if command.NArg() < 1 {
+						return errors.New("path name is required")
+					}
+					var version string
+					if command.NArg() > 1 {
+						version = command.Args().Get(1)
+					}
+
+					c, err := newCmd(command)
+					if err != nil {
+						return err
+					}
+
+					return c.Upgrade(ctx, command.Args().First(), version, false, false)
+				},
+			},
+			{
 				Name: "version-check",
 				Action: func(ctx context.Context, command *cli.Command) error {
 					c, err := newCmd(command)

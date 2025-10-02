@@ -55,3 +55,29 @@ func Exists(filePath string) bool {
 	}
 	return false
 }
+
+// GenerateUniqueFilename attempts to create a file with a unique name in the specified directory.
+// It appends a counter to the base filename until a non-existent name is found and the file is created.
+func GenerateUniqueFilename(dir, baseName, extension string) (string, error) {
+	for i := 0; i < 1000; i++ { // Limit retries to prevent infinite loops
+		var filename string
+		if i == 0 {
+			filename = baseName + extension
+		} else {
+			filename = fmt.Sprintf("%s_%d%s", baseName, i, extension)
+		}
+
+		filePath := filepath.Join(dir, filename)
+
+		// Use os.OpenFile with os.O_EXCL to ensure atomic creation and check for existence
+		_, err := os.Stat(filePath)
+		if os.IsExist(err) {
+			continue // File exists, try next iteration
+		}
+		if err != nil {
+			return "", fmt.Errorf("failed to create file %s: %w", filePath, err)
+		}
+		return filePath, nil // Success, return the path and the opened file
+	}
+	return "", fmt.Errorf("could not generate a unique filename after multiple attempts")
+}

@@ -29,7 +29,7 @@ func (c *Cmd) printVersionCheck(ctx context.Context, chartConfig config.Chart) e
 		if err != nil {
 			return fmt.Errorf("error loading chart file %s: %w\n", currentChartFilename, err)
 		}
-		fmt.Printf("- current version: %s\n", currentChart.Version)
+		fmt.Printf("- local version: %s\n", currentChart.Version)
 	}
 
 	repo, err := helm.LoadRepository(chartConfig.Repository.URL)

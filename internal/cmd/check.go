@@ -29,7 +29,7 @@ func (c *Cmd) checkChart(ctx context.Context, chartConfig config.Chart) error {
 		if err != nil {
 			return fmt.Errorf("error loading chart file %s: %w\n", currentChartFilename, err)
 		}
-		fmt.Printf("- local version: %s\n", currentChart.Version)
+		fmt.Printf("- local: %s\n", currentChart.Version)
 	}
 
 	repo, err := helm.LoadRepository(chartConfig.Repository.URL)
@@ -42,7 +42,7 @@ func (c *Cmd) checkChart(ctx context.Context, chartConfig config.Chart) error {
 		return err
 	}
 	fmt.Printf("- description: %s\n", latestChart.Chart().Description)
-	fmt.Printf("- latest version: %s\n", latestChart.Chart().Version)
+	fmt.Printf("- latest: %s\n", latestChart.Chart().Version)
 	fmt.Printf("- versions:\n")
 	for entry, err := range repo.ChartVersions(chartConfig.Name, 10) {
 		if err != nil {

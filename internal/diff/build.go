@@ -16,17 +16,17 @@ func NewBuilder(diffEnabled bool) *Builder {
 	return &Builder{diffEnabled: diffEnabled}
 }
 
-func (b *Builder) Add(sourcePath, destPath string, sourceFile, destFile string) error {
+func (b *Builder) Add(sourcePath, destPath string, sourceFS, destFS *os.Root, sourceFile, destFile string) error {
 	if !b.diffEnabled {
 		return nil
 	}
 
-	sourceFileData, err := os.ReadFile(sourceFile)
+	sourceFileData, err := sourceFS.ReadFile(sourceFile)
 	if err != nil {
 		return err
 	}
 
-	destFileData, err := os.ReadFile(destFile)
+	destFileData, err := destFS.ReadFile(destFile)
 	if os.IsNotExist(err) {
 		destFileData = []byte("")
 	} else if err != nil {
@@ -36,7 +36,7 @@ func (b *Builder) Add(sourcePath, destPath string, sourceFile, destFile string) 
 	// get a diff of the files
 	edits := udiff.Bytes(sourceFileData, destFileData)
 	if len(edits) > 0 {
-		diffstr, err := udiff.ToUnified(sourcePath, sourcePath, string(sourceFileData), edits, udiff.DefaultContextLines)
+		diffstr, err := udiff.ToUnified(sourcePath, destPath, string(sourceFileData), edits, udiff.DefaultContextLines)
 		if err != nil {
 			return err
 		}

@@ -15,8 +15,8 @@ func Decode(r io.Reader, data any) error {
 	return yaml.UnmarshalStrict(f, data)
 }
 
-func DecodeFile(filename string, data any) error {
-	f, err := os.Open(filename)
+func DecodeFile(fsys *os.Root, filename string, data any) error {
+	f, err := fsys.Open(filename)
 	if err != nil {
 		return err
 	}

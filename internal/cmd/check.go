@@ -3,7 +3,6 @@ package cmd
 import (
 	"context"
 	"fmt"
-	"path/filepath"
 	"time"
 
 	"github.com/rrgmc/helm-vendor/internal/config"
@@ -22,13 +21,20 @@ func (c *Cmd) Check(ctx context.Context, path string) error {
 }
 
 func (c *Cmd) checkChart(ctx context.Context, chartConfig config.Chart) error {
+	chartRoot, err := c.openChartRoot(chartConfig)
+	if err != nil {
+		return err
+	}
+	defer chartRoot.Close()
+
 	fmt.Printf("%s:\n", chartConfig.Path)
 
-	currentChartFilename := filepath.Join(c.buildChartPath(chartConfig), "Chart.yaml")
+	// currentChartFilename := filepath.Join(c.buildChartPath(chartConfig), "Chart.yaml")
+	currentChartFilename := "Chart.yaml"
 	var currentChart *repo.ChartVersion
-	if file.Exists(currentChartFilename) {
+	if file.ExistsFS(chartRoot, currentChartFilename) {
 		var err error
-		currentChart, err = helm.LoadHelmChartVersionFile(currentChartFilename)
+		currentChart, err = helm.LoadHelmChartVersionFile(chartRoot, currentChartFilename)
 		if err != nil {
 			return fmt.Errorf("error loading chart file %s: %w\n", currentChartFilename, err)
 		}

@@ -2,6 +2,7 @@ package helm
 
 import (
 	"io"
+	"os"
 
 	"github.com/rrgmc/helm-vendor/internal/yaml"
 	"helm.sh/helm/v3/pkg/cli"
@@ -17,9 +18,9 @@ func LoadHelmChartVersion(r io.Reader) (*repo.ChartVersion, error) {
 	return &chart, nil
 }
 
-func LoadHelmChartVersionFile(filename string) (*repo.ChartVersion, error) {
+func LoadHelmChartVersionFile(fsys *os.Root, filename string) (*repo.ChartVersion, error) {
 	var chart repo.ChartVersion
-	if err := yaml.DecodeFile(filename, &chart); err != nil {
+	if err := yaml.DecodeFile(fsys, filename, &chart); err != nil {
 		return nil, err
 	}
 	return &chart, nil

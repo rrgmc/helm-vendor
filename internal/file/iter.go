@@ -4,7 +4,6 @@ import (
 	"errors"
 	"io/fs"
 	"iter"
-	"os"
 	"path/filepath"
 )
 
@@ -16,11 +15,10 @@ type Info struct {
 
 type Iter = iter.Seq2[Info, error]
 
-func IterDir(rootPath string) Iter {
+func IterDir(fsys fs.FS, rootPath string) Iter {
 	errEnd := errors.New("end")
 	return func(yield func(Info, error) bool) {
-		dir := os.DirFS(rootPath)
-		err := fs.WalkDir(dir, ".", func(path string, d fs.DirEntry, err error) error {
+		err := fs.WalkDir(fsys, ".", func(path string, d fs.DirEntry, err error) error {
 			if err != nil {
 				return err
 			}

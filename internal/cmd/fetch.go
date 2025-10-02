@@ -21,9 +21,16 @@ func (c *Cmd) Fetch(ctx context.Context, path string, version string) error {
 }
 
 func (c *Cmd) fetchChart(ctx context.Context, chartConfig config.Chart, version string) error {
-	chartOutputPath := c.buildChartPath(chartConfig)
-	currentChartFilename := filepath.Join(chartOutputPath, "Chart.yaml")
-	if file.Exists(currentChartFilename) {
+	chartRoot, err := c.openChartRoot(chartConfig)
+	if err != nil {
+		return err
+	}
+	defer chartRoot.Close()
+
+	// chartOutputPath := c.buildChartPath(chartConfig)
+	// currentChartFilename := filepath.Join(chartOutputPath, "Chart.yaml")
+	currentChartFilename := "Chart.yaml"
+	if file.ExistsFS(chartRoot, currentChartFilename) {
 		return fmt.Errorf("chart already exists in path '%s', use upgrade to download a newer version", chartConfig.Path)
 	}
 
@@ -59,13 +66,14 @@ func (c *Cmd) fetchChart(ctx context.Context, chartConfig config.Chart, version 
 		if fi.Entry.IsDir() {
 			continue
 		}
-		targetFile := filepath.Join(chartOutputPath, fi.Path)
-		err = os.MkdirAll(filepath.Dir(targetFile), os.ModePerm)
+		// targetFile := filepath.Join(chartOutputPath, fi.Path)
+		targetFile := fi.Path
+		err = chartRoot.MkdirAll(filepath.Dir(targetFile), os.ModePerm)
 		if err != nil {
 			return err
 		}
 
-		err = file.CopyFile(fi.FullPath, targetFile)
+		err = file.CopyFileFS(chartFiles.Root(), chartRoot, fi.FullPath, targetFile)
 		if err != nil {
 			return err
 		}

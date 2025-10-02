@@ -2,6 +2,7 @@ package helm
 
 import (
 	"fmt"
+	"iter"
 	"os"
 	"path/filepath"
 
@@ -61,6 +62,26 @@ func (r *Repository) GetChart(name, version string) (*Chart, error) {
 		return nil, fmt.Errorf("error getting chart from index: %w", err)
 	}
 	return LoadChart(r, chart)
+}
+
+func (r *Repository) ChartVersions(name string, maxAmount int) iter.Seq2[*repo.ChartVersion, error] {
+	return func(yield func(*repo.ChartVersion, error) bool) {
+		chartEntries, ok := r.index.Entries[name]
+		if !ok {
+			yield(nil, fmt.Errorf("unknown chart %s", name))
+			return
+		}
+		var ct int
+		for _, entry := range chartEntries {
+			if !yield(entry, nil) {
+				return
+			}
+			ct++
+			if maxAmount > 0 && ct >= maxAmount {
+				return
+			}
+		}
+	}
 }
 
 func (r *Repository) Close() error {

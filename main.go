@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -32,6 +33,21 @@ func run(ctx context.Context) error {
 			},
 		},
 		Commands: []*cli.Command{
+			{
+				Name: "check",
+				Action: func(ctx context.Context, command *cli.Command) error {
+					if command.NArg() < 1 {
+						return errors.New("chart path is required")
+					}
+
+					c, err := newCmd(command)
+					if err != nil {
+						return err
+					}
+
+					return c.Check(ctx, command.Args().First())
+				},
+			},
 			{
 				Name: "version-check",
 				Action: func(ctx context.Context, command *cli.Command) error {

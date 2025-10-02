@@ -21,7 +21,7 @@ func (c *Cmd) CheckAll(ctx context.Context) error {
 }
 
 func (c *Cmd) runCheckAll(ctx context.Context, chartConfig config.Chart) error {
-	fmt.Printf("%s:\n", chartConfig.Path)
+	fmt.Printf("- %s:", chartConfig.Path)
 
 	currentChartFilename := filepath.Join(c.buildChartPath(chartConfig), "Chart.yaml")
 	if file.Exists(currentChartFilename) {
@@ -29,7 +29,7 @@ func (c *Cmd) runCheckAll(ctx context.Context, chartConfig config.Chart) error {
 		if err != nil {
 			return fmt.Errorf("error loading chart file %s: %w\n", currentChartFilename, err)
 		}
-		fmt.Printf("- local: %s\n", currentChart.Version)
+		fmt.Printf(" [local:%s]", currentChart.Version)
 	}
 
 	repo, err := helm.LoadRepository(chartConfig.Repository.URL)
@@ -41,7 +41,9 @@ func (c *Cmd) runCheckAll(ctx context.Context, chartConfig config.Chart) error {
 	if err != nil {
 		return err
 	}
-	fmt.Printf("- latest: %s\n", latestChart.Chart().Version)
+	fmt.Printf(" [latest:%s]", latestChart.Chart().Version)
+
+	fmt.Printf("\n")
 
 	return nil
 }

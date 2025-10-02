@@ -8,8 +8,7 @@ import (
 )
 
 type Info struct {
-	Path string
-	// FullPath string
+	Path  string
 	Entry fs.DirEntry
 }
 
@@ -26,8 +25,7 @@ func IterDir(fsys fs.FS, rootPath string) Iter {
 				return nil
 			}
 			fi := Info{
-				Path: filepath.ToSlash(path),
-				// FullPath: filepath.Join(rootPath, path),
+				Path:  filepath.ToSlash(path),
 				Entry: d,
 			}
 			if !yield(fi, nil) {

@@ -32,8 +32,6 @@ func (c *Cmd) upgradeChart(ctx context.Context, chartConfig config.Chart, versio
 	}
 	defer chartRoot.Close()
 
-	// chartOutputPath := c.buildChartPath(chartConfig)
-	// currentChartFilename := filepath.Join(chartOutputPath, "Chart.yaml")
 	currentChartFilename := "Chart.yaml"
 	if !file.Exists(chartRoot, currentChartFilename) {
 		return fmt.Errorf("chart not found in path '%s', use fetch to download an initial version", chartConfig.Path)
@@ -95,10 +93,8 @@ func (c *Cmd) upgradeChart(ctx context.Context, chartConfig config.Chart, versio
 				continue
 			}
 
-			// localFile := filepath.Join(chartOutputPath, sourceChartFile.Path)
-			localFile := sourceChartFile.Path
-
-			err = diffBuilder.Add(sourceChartFile.Path, sourceChartFile.Path, sourceChartFiles.Root(), chartRoot, sourceChartFile.Path, localFile)
+			err = diffBuilder.Add(sourceChartFile.Path, sourceChartFile.Path, sourceChartFiles.Root(), chartRoot,
+				sourceChartFile.Path, sourceChartFile.Path)
 			if err != nil {
 				return err
 			}
@@ -148,14 +144,13 @@ func (c *Cmd) upgradeChart(ctx context.Context, chartConfig config.Chart, versio
 		if fi.Entry.IsDir() {
 			continue
 		}
-		// targetFile := filepath.Join(chartOutputPath, fi.Path)
-		targetFile := fi.Path
-		err = chartRoot.MkdirAll(filepath.Dir(targetFile), os.ModePerm)
+
+		err = chartRoot.MkdirAll(filepath.Dir(fi.Path), os.ModePerm)
 		if err != nil {
 			return err
 		}
 
-		err = file.CopyFile(latestChartFiles.Root(), chartRoot, fi.Path, targetFile)
+		err = file.CopyFile(latestChartFiles.Root(), chartRoot, fi.Path, fi.Path)
 		if err != nil {
 			return err
 		}
@@ -169,11 +164,9 @@ func (c *Cmd) upgradeChart(ctx context.Context, chartConfig config.Chart, versio
 		}
 
 		for filediff := range patcher.Files() {
-			// targetFile := filepath.Join(chartOutputPath, filediff.NewName)
-			targetFile := filediff.NewName
-			targetFileData, err := chartRoot.ReadFile(targetFile)
+			targetFileData, err := chartRoot.ReadFile(filediff.NewName)
 			if errors.Is(err, fs.ErrNotExist) {
-				fmt.Printf("patching %s failed: %s does not exist\n", filediff.NewName, targetFile)
+				fmt.Printf("patching %s failed: %s does not exist\n", filediff.NewName, filediff.NewName)
 				continue
 			} else if err != nil {
 				return err
@@ -187,7 +180,7 @@ func (c *Cmd) upgradeChart(ctx context.Context, chartConfig config.Chart, versio
 				if errors.As(err, &fconflict) {
 					fmt.Printf("conflict applying patch to %s: %s\n", filediff.NewName, err)
 
-					conflictFileName, err := file.GenerateUniqueFilename(chartRoot, filepath.Dir(targetFile),
+					conflictFileName, err := file.GenerateUniqueFilename(chartRoot, filepath.Dir(filediff.NewName),
 						file.NameExtFormat(filediff.NewName)+"_conflict", ".diff")
 					if err != nil {
 						return fmt.Errorf("error generating conflict file: %w", err)
@@ -210,7 +203,7 @@ func (c *Cmd) upgradeChart(ctx context.Context, chartConfig config.Chart, versio
 
 			fmt.Printf("applied patch to %s\n", filediff.NewName)
 
-			err = chartRoot.WriteFile(targetFile, output.Bytes(), os.ModePerm)
+			err = chartRoot.WriteFile(filediff.NewName, output.Bytes(), os.ModePerm)
 			if err != nil {
 				return fmt.Errorf("error applying patch to %s: %w", filediff.NewName, err)
 			}

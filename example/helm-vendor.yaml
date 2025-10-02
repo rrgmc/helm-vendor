@@ -1,3 +1,4 @@
+outputPath: data
 charts:
   - path: opentelemetry-collector
     repository:

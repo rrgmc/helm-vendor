@@ -27,7 +27,6 @@ func (c *Cmd) runCheckAll(ctx context.Context, chartConfig config.Chart) error {
 	}
 	defer chartRoot.Close()
 
-	// currentChartFilename := filepath.Join(c.buildChartPath(chartConfig), "Chart.yaml")
 	currentChartFilename := "Chart.yaml"
 	var currentChart *repo.ChartVersion
 	if file.Exists(chartRoot, currentChartFilename) {

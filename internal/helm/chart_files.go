@@ -32,7 +32,6 @@ func (c *ChartFiles) Root() *os.Root {
 }
 
 func (c *ChartFiles) Iter() file.Iter {
-	// return file.IterDir(c.chartRoot.FS(), filepath.Join(c.path, filepath.Clean(c.chart.chart.Name)))
 	return file.IterDir(c.chartRoot.FS(), ".")
 }
 

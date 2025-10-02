@@ -49,10 +49,6 @@ func WithOutputRoot(outputRoot string) Option {
 
 type Option func(*Cmd)
 
-// func (c *Cmd) buildChartPath(chartConfig config.Chart) string {
-// 	return filepath.Join(c.outputRootPath, filepath.Clean(chartConfig.Path))
-// }
-
 func (c *Cmd) openChartRoot(chartConfig config.Chart) (*os.Root, error) {
 	r, err := c.outputRoot.OpenRoot(filepath.Clean(chartConfig.Path))
 	if err != nil {

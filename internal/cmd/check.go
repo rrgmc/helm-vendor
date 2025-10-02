@@ -29,7 +29,6 @@ func (c *Cmd) checkChart(ctx context.Context, chartConfig config.Chart) error {
 
 	fmt.Printf("%s:\n", chartConfig.Path)
 
-	// currentChartFilename := filepath.Join(c.buildChartPath(chartConfig), "Chart.yaml")
 	currentChartFilename := "Chart.yaml"
 	var currentChart *repo.ChartVersion
 	if file.Exists(chartRoot, currentChartFilename) {

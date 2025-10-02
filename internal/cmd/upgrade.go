@@ -35,7 +35,7 @@ func (c *Cmd) upgradeChart(ctx context.Context, chartConfig config.Chart, versio
 	// chartOutputPath := c.buildChartPath(chartConfig)
 	// currentChartFilename := filepath.Join(chartOutputPath, "Chart.yaml")
 	currentChartFilename := "Chart.yaml"
-	if !file.Exists(currentChartFilename) {
+	if !file.ExistsFS(chartRoot, currentChartFilename) {
 		return fmt.Errorf("chart not found in path '%s', use fetch to download an initial version", chartConfig.Path)
 	}
 

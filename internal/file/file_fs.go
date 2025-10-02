@@ -35,7 +35,7 @@ func ExistsFS(fsys *os.Root, filePath string) bool {
 	if err == nil {
 		return true
 	}
-	if os.IsNotExist(err) {
+	if errors.Is(err, fs.ErrNotExist) {
 		return false
 	}
 	return false

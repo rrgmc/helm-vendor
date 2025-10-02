@@ -2,6 +2,8 @@ package diff
 
 import (
 	"bytes"
+	"errors"
+	"io/fs"
 	"os"
 
 	"github.com/aymanbagabas/go-udiff"
@@ -27,7 +29,7 @@ func (b *Builder) Add(sourcePath, destPath string, sourceFS, destFS *os.Root, so
 	}
 
 	destFileData, err := destFS.ReadFile(destFile)
-	if os.IsNotExist(err) {
+	if errors.Is(err, fs.ErrNotExist) {
 		destFileData = []byte("")
 	} else if err != nil {
 		return err

@@ -110,7 +110,7 @@ func newCmd(command *cli.Command, options ...cmd.Option) (*cmd.Cmd, error) {
 		if err != nil {
 			return nil, fmt.Errorf("failed to get absolute config path: %w", err)
 		}
-		outputRoot = filepath.Base(cfgPath)
+		outputRoot = filepath.Dir(cfgPath)
 	}
 
 	return cmd.NewFromFile(command.String("config-file"),

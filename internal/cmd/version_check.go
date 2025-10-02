@@ -23,7 +23,7 @@ func (c *Cmd) VersionCheck(ctx context.Context) error {
 func (c *Cmd) printVersionCheck(ctx context.Context, chartConfig config.Chart) error {
 	fmt.Printf("%s:\n", chartConfig.Path)
 
-	currentChartFilename := filepath.Join(c.outputRoot, chartConfig.Path, "Chart.yaml")
+	currentChartFilename := filepath.Join(c.buildChartPath(chartConfig), "Chart.yaml")
 	if file.Exists(currentChartFilename) {
 		currentChart, err := helm.LoadHelmChartVersionFile(currentChartFilename)
 		if err != nil {

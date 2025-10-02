@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"fmt"
+	"path/filepath"
 
 	"github.com/rrgmc/helm-vendor/internal/config"
 )
@@ -36,3 +37,7 @@ func WithOutputRoot(outputRoot string) Option {
 }
 
 type Option func(*Cmd)
+
+func (c *Cmd) buildChartPath(chartConfig config.Chart) string {
+	return filepath.Join(c.outputRoot, filepath.Clean(chartConfig.Path))
+}

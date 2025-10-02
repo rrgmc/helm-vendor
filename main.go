@@ -37,7 +37,7 @@ func run(ctx context.Context) error {
 				Name: "check",
 				Action: func(ctx context.Context, command *cli.Command) error {
 					if command.NArg() < 1 {
-						return errors.New("chart path is required")
+						return errors.New("path name is required")
 					}
 
 					c, err := newCmd(command)
@@ -46,6 +46,25 @@ func run(ctx context.Context) error {
 					}
 
 					return c.Check(ctx, command.Args().First())
+				},
+			},
+			{
+				Name: "fetch",
+				Action: func(ctx context.Context, command *cli.Command) error {
+					if command.NArg() < 1 {
+						return errors.New("path name is required")
+					}
+					var version string
+					if command.NArg() > 1 {
+						version = command.Args().Get(1)
+					}
+
+					c, err := newCmd(command)
+					if err != nil {
+						return err
+					}
+
+					return c.Fetch(ctx, command.Args().First(), version)
 				},
 			},
 			{

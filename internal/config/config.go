@@ -8,7 +8,8 @@ import (
 )
 
 type Config struct {
-	Charts []Chart `yaml:"charts"`
+	OutputPath string  `yaml:"outputPath"`
+	Charts     []Chart `yaml:"charts"`
 }
 
 type Chart struct {

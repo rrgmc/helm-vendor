@@ -21,6 +21,11 @@ func (c *Cmd) Fetch(ctx context.Context, path string, version string) error {
 }
 
 func (c *Cmd) fetchChart(ctx context.Context, chartConfig config.Chart, version string) error {
+	err := c.createChartRoot(chartConfig)
+	if err != nil {
+		return fmt.Errorf("error creating chart root folder: %w", err)
+	}
+
 	chartRoot, err := c.openChartRoot(chartConfig)
 	if err != nil {
 		return err

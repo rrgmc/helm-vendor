@@ -6,6 +6,7 @@ import (
 	"path/filepath"
 
 	"github.com/rrgmc/helm-vendor/internal/config"
+	"github.com/rrgmc/helm-vendor/internal/file"
 )
 
 type Cmd struct {
@@ -21,6 +22,12 @@ func New(cfg config.Config, options ...Option) (*Cmd, error) {
 	for _, option := range options {
 		option(ret)
 	}
+	if cfg.OutputPath != "" {
+		ret.outputRootPath = filepath.Join(ret.outputRootPath, cfg.OutputPath)
+	}
+
+	_ = os.MkdirAll(ret.outputRootPath, os.ModePerm)
+
 	var err error
 	ret.outputRoot, err = os.OpenRoot(ret.outputRootPath)
 	if err != nil {
@@ -55,4 +62,16 @@ func (c *Cmd) openChartRoot(chartConfig config.Chart) (*os.Root, error) {
 		return nil, fmt.Errorf("failed to open chart path: %w", err)
 	}
 	return r, nil
+}
+
+func (c *Cmd) chartRootExists(chartConfig config.Chart) bool {
+	return file.Exists(c.outputRoot, filepath.Clean(chartConfig.Path))
+}
+
+func (c *Cmd) createChartRoot(chartConfig config.Chart) error {
+	return c.outputRoot.MkdirAll(filepath.Clean(chartConfig.Path), os.ModePerm)
+}
+
+func (c *Cmd) chartRootFileExists(chartConfig config.Chart) bool {
+	return file.Exists(c.outputRoot, filepath.Join(filepath.Clean(chartConfig.Path), "Chart.yaml"))
 }

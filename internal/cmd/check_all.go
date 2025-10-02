@@ -12,6 +12,10 @@ import (
 
 func (c *Cmd) CheckAll(ctx context.Context) error {
 	for _, chartConfig := range c.cfg.Charts {
+		if !c.chartRootExists(chartConfig) {
+			fmt.Printf("- %s: not found\n", chartConfig.Path)
+			continue
+		}
 		err := c.runCheckAll(ctx, chartConfig)
 		if err != nil {
 			fmt.Printf("error checking chart: %s\n", err)

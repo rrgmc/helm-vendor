@@ -27,10 +27,6 @@ func run(ctx context.Context) error {
 				Aliases: []string{"c"},
 				Value:   "helm-vendor.yaml",
 			},
-			&cli.StringFlag{
-				Name:  "output-root",
-				Value: "",
-			},
 		},
 		Commands: []*cli.Command{
 			{
@@ -67,6 +63,18 @@ func run(ctx context.Context) error {
 					defer c.Close()
 
 					return c.Fetch(ctx, command.Args().First(), version)
+				},
+			},
+			{
+				Name: "fetch-all",
+				Action: func(ctx context.Context, command *cli.Command) error {
+					c, err := newCmd(command)
+					if err != nil {
+						return err
+					}
+					defer c.Close()
+
+					return c.FetchAll(ctx)
 				},
 			},
 			{
@@ -108,15 +116,13 @@ func run(ctx context.Context) error {
 }
 
 func newCmd(command *cli.Command, options ...cmd.Option) (*cmd.Cmd, error) {
-	outputRoot := command.String("output-root")
-	if outputRoot == "" {
-		cfgPath, err := filepath.Abs(command.String("config-file"))
-		if err != nil {
-			return nil, fmt.Errorf("failed to get absolute config path: %w", err)
-		}
-		outputRoot = filepath.Dir(cfgPath)
+	cfgPath, err := filepath.Abs(command.String("config-file"))
+	if err != nil {
+		return nil, fmt.Errorf("failed to get absolute config path: %w", err)
 	}
+	outputRoot := filepath.Dir(cfgPath)
 
-	return cmd.NewFromFile(command.String("config-file"),
-		cmd.WithOutputRoot(outputRoot))
+	options = append(options, cmd.WithOutputRoot(outputRoot))
+
+	return cmd.NewFromFile(command.String("config-file"), options...)
 }

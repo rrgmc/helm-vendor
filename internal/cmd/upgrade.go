@@ -14,6 +14,7 @@ import (
 	"github.com/rrgmc/helm-vendor/internal/diff"
 	"github.com/rrgmc/helm-vendor/internal/file"
 	"github.com/rrgmc/helm-vendor/internal/helm"
+	"helm.sh/helm/v3/pkg/registry"
 )
 
 func (c *Cmd) Upgrade(ctx context.Context, path string, version string, ignoreCurrent bool, applyPatch bool) error {
@@ -41,6 +42,10 @@ func (c *Cmd) upgradeChart(ctx context.Context, chartConfig config.Chart, versio
 	currentChartVersionFile, err := helm.LoadHelmChartVersionFile(chartRoot, currentChartFilename)
 	if err != nil {
 		return fmt.Errorf("error loading current chart version file: %w", err)
+	}
+
+	if registry.IsOCI(chartConfig.Repository.URL) {
+
 	}
 
 	repo, err := helm.LoadRepository(chartConfig.Repository.URL)

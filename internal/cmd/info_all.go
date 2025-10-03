@@ -13,12 +13,12 @@ import (
 func (c *Cmd) InfoAll(ctx context.Context) error {
 	for _, chartConfig := range c.cfg.Charts {
 		if !c.chartRootExists(chartConfig) {
-			fmt.Printf("- %s: not found\n", chartConfig.Path)
+			fmt.Printf("! %s: not found\n", chartConfig.Path)
 			continue
 		}
 		err := c.runInfoAll(ctx, chartConfig)
 		if err != nil {
-			fmt.Printf("error getting chart info: %s\n", err)
+			fmt.Printf("! %s: error getting info: %s\n", chartConfig.Path, err)
 		}
 	}
 	return nil

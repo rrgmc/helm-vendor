@@ -32,11 +32,13 @@ func (c *Chart) Download(options ...ChartDownloadOption) (*ChartFiles, error) {
 		opt(&optns)
 	}
 
+	var chartURL string
+
 	if len(c.chart.URLs) == 0 {
 		return nil, errors.New("chart has no downloadable URLs")
 	}
 
-	chartURL := c.chart.URLs[0]
+	chartURL = c.chart.URLs[0]
 
 	absoluteChartURL, err := c.repository.ResolveReferenceURL(chartURL)
 	if err != nil {
@@ -53,8 +55,9 @@ func (c *Chart) Download(options ...ChartDownloadOption) (*ChartFiles, error) {
 	}
 
 	dl := downloader.ChartDownloader{
-		Out:     os.Stderr,
-		Getters: allGetters,
+		Out:            os.Stderr,
+		Getters:        allGetters,
+		RegistryClient: c.repository.registry,
 	}
 
 	chartPackageFile, _, err := dl.DownloadTo(absoluteChartURL, c.chart.Version, optns.downloadPath)

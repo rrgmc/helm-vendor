@@ -14,7 +14,11 @@ import (
 func (c *Cmd) Fetch(ctx context.Context, path string, version string) error {
 	for _, chartConfig := range c.cfg.Charts {
 		if path == chartConfig.Path {
-			return c.fetchChart(ctx, chartConfig, version)
+			err := c.fetchChart(ctx, chartConfig, version)
+			if err != nil {
+				return fmt.Errorf("%s: %w", path, err)
+			}
+			return nil
 		}
 	}
 	return fmt.Errorf("unknown path '%s'", path)

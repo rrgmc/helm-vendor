@@ -23,3 +23,7 @@ charts:
     repository:
       url: https://go.temporal.io/helm-charts/
     name: temporal
+  - path: strimzi-kafka-operator
+    repository:
+      url: oci://quay.io/strimzi-helm
+    name: strimzi-kafka-operator

@@ -6,6 +6,7 @@ import (
 	"iter"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"helm.sh/helm/v3/pkg/chart"
 	"helm.sh/helm/v3/pkg/helmpath"
@@ -102,7 +103,7 @@ func (r *Repository) GetChart(name, version string) (*Chart, error) {
 				Name:    name,
 				Version: version,
 			},
-			URLs: []string{fmt.Sprintf("%s/%s", r.repository.Config.URL, name)},
+			URLs: []string{fmt.Sprintf("%s/%s", strings.TrimSuffix(strings.TrimSpace(r.repository.Config.URL), "/"), name)},
 		})
 
 		// return nil, errors.New("cannot get chart from OCI registry")

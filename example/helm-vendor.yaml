@@ -25,5 +25,5 @@ charts:
     name: temporal
   - path: strimzi-kafka-operator
     repository:
-      url: oci://quay.io/strimzi-helm
+      url: oci://quay.io/strimzi-helm/
     name: strimzi-kafka-operator

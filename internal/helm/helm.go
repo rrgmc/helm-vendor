@@ -26,4 +26,12 @@ func LoadHelmChartVersionFile(root *os.Root, filename string) (*repo.ChartVersio
 	return &chart, nil
 }
 
+func GetChartVersion(chartVersion *repo.ChartVersion) string {
+	ver := chartVersion.Version
+	if ver == "" {
+		ver = "unknown"
+	}
+	return ver
+}
+
 var allGetters = getter.All(&cli.EnvSettings{})

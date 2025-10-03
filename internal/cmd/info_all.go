@@ -55,7 +55,7 @@ func (c *Cmd) runInfoAll(ctx context.Context, chartConfig config.Chart) error {
 	if currentChart != nil {
 		fmt.Printf(" [local:%s]", currentChart.Version)
 	}
-	fmt.Printf(" [latest:%s]", latestChart.Chart().Version)
+	fmt.Printf(" [latest:%s]", helm.GetChartVersion(latestChart.Chart()))
 	fmt.Printf("\n")
 
 	return nil

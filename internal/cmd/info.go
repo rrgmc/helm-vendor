@@ -52,11 +52,12 @@ func (c *Cmd) infoChart(ctx context.Context, chartConfig config.Chart) error {
 	if currentChart != nil {
 		fmt.Printf("- local: %s\n", currentChart.Version)
 	}
-	fmt.Printf("- latest: %s\n", latestChart.Chart().Version)
+	fmt.Printf("- latest: %s\n", helm.GetChartVersion(latestChart.Chart()))
 	fmt.Printf("- versions:\n")
 	for entry, err := range repository.ChartVersions(chartConfig.Name, 10) {
 		if err != nil {
-			return err
+			fmt.Printf("error listing chart versions: %s\n", err)
+			break
 		}
 		fmt.Printf("\t- %s [%s]\n", entry.Version, entry.Created.Format(time.DateOnly))
 	}

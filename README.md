@@ -17,7 +17,7 @@ Get an executable from the [releases](https://github.com/rrgmc/helm-vendor/relea
 available:
 
 ```shell
-go get github.com/rrgmc/helm-vendor
+go install github.com/rrgmc/helm-vendor@latest
 ```
 
 ## Example

@@ -31,8 +31,9 @@ func run(ctx context.Context) error {
 		},
 		Commands: []*cli.Command{
 			{
-				Name:  "info",
-				Usage: "Show chart information and versioning",
+				Name:      "info",
+				Usage:     "Show chart information and versioning",
+				UsageText: "helm-vendor info [options] [path]",
 				Action: func(ctx context.Context, command *cli.Command) error {
 					c, err := newCmd(command)
 					if err != nil {
@@ -48,8 +49,9 @@ func run(ctx context.Context) error {
 				},
 			},
 			{
-				Name:  "fetch",
-				Usage: "Fetch new charts. If the chart was already fetched, use the 'upgrade' command",
+				Name:      "fetch",
+				Usage:     "Fetch new charts. If the chart was already fetched, use the 'upgrade' command",
+				UsageText: "helm-vendor fetch [options] [path | --all]",
 				Flags: []cli.Flag{
 					&cli.BoolFlag{
 						Name:    "all",
@@ -81,8 +83,9 @@ func run(ctx context.Context) error {
 				},
 			},
 			{
-				Name:  "upgrade",
-				Usage: "Upgrade a chart to a new version",
+				Name:      "upgrade",
+				Usage:     "Upgrade a chart to a new version",
+				UsageText: "helm-vendor upgrade [options] path [version]",
 				Flags: []cli.Flag{
 					&cli.BoolFlag{
 						Name:  "ignore-current",

@@ -11,6 +11,15 @@ Features:
 - Optionally a diff can be made of any local changes in relation to the original chart, and the patch applied on 
   the new version during upgrade. 
 
+## Install
+
+Get an executable from the [releases](https://github.com/rrgmc/helm-vendor/releases) or if you have a Go 1.25 compiler
+available:
+
+```shell
+go get github.com/rrgmc/helm-vendor
+```
+
 ## Example
 
 **helm-vendor.yaml**:

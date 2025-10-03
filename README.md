@@ -89,10 +89,10 @@ $ helm-vendor upgrade opentelemetry-collector
 
 Upgrading the `opentelemetry-collector` version from the local one `0.133.1` to latest `0.136.1`:
 
-- download the `0.133.1` version.
+- download the `0.133.1` version to a temporary folder.
 - create a `diff` of the files contained in this chart version with the current local files, and write it to the root folder.
 - delete all files from the local folder which are contained in this chart version. This ensures any custom file is kept.
-- download the `0.136.1` version.
+- download the `0.136.1` version to a temporary folder.
 - copy all files contained in this chart version to the output folder, respecting the `ignore` configuration.
 - if `apply-patch=true` is set, the `diff` generated above is applied to the new chart version.
 

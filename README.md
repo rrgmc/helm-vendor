@@ -10,8 +10,8 @@ Features:
   locally, before unpacking the new version. This ensures any new file added manually will be kept.
 - Optionally a diff can be made of any local changes in relation to the original chart, and the patch applied on 
   the new version during upgrade.
-- OCI repository support, but it don't have native version querying and listing, so only fetching and upgrading
-  is possible.
+- OCI repository support, but it don't have native version querying and listing, so flows which needs to query versions
+  may not work.
 
 ## Install
 

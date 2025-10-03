@@ -97,14 +97,18 @@ func (r *Repository) ResolveReferenceURL(url string) (string, error) {
 
 func (r *Repository) GetChart(name, version string) (*Chart, error) {
 	if r.index == nil {
-		return LoadChart(r, &repo.ChartVersion{
-			Metadata: &chart.Metadata{
-				Name:    name,
-				Version: version,
-			},
-			URLs: []string{JoinHTTPPaths(r.repository.Config.URL, name)},
-		})
-
+		findChart, err := r.FindChartVersion(name, version)
+		if err != nil || findChart == nil {
+			// errors may be because it is not possible to list tags
+			return LoadChart(r, &repo.ChartVersion{
+				Metadata: &chart.Metadata{
+					Name:    name,
+					Version: version,
+				},
+				URLs: []string{JoinHTTPPaths(r.repository.Config.URL, name)},
+			})
+		}
+		return LoadChart(r, findChart)
 		// return nil, errors.New("cannot get chart from OCI registry")
 	}
 
@@ -113,6 +117,22 @@ func (r *Repository) GetChart(name, version string) (*Chart, error) {
 		return nil, fmt.Errorf("error getting chart from index: %w", err)
 	}
 	return LoadChart(r, c)
+}
+
+func (r *Repository) FindChartVersion(name string, version string) (*repo.ChartVersion, error) {
+	for cv, err := range r.ChartVersions(name, 0) {
+		if err != nil {
+			return nil, err
+		}
+		if version == "" {
+			// return the first one
+			return cv, nil
+		}
+		if version == cv.Version {
+			return cv, nil
+		}
+	}
+	return nil, nil
 }
 
 func (r *Repository) ChartVersions(name string, maxAmount int) iter.Seq2[*repo.ChartVersion, error] {
@@ -157,6 +177,7 @@ func (r *Repository) chartVersionsOCI(name string, maxAmount int) iter.Seq2[*rep
 					Name:    name,
 					Version: entry,
 				},
+				URLs: []string{JoinHTTPPaths(r.repository.Config.URL, name) + ":" + entry},
 			}, nil) {
 				return
 			}

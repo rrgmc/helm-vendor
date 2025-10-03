@@ -6,7 +6,6 @@ import (
 	"time"
 
 	"github.com/rrgmc/helm-vendor/internal/config"
-	"github.com/rrgmc/helm-vendor/internal/file"
 	"github.com/rrgmc/helm-vendor/internal/helm"
 	"helm.sh/helm/v3/pkg/repo"
 )
@@ -21,18 +20,17 @@ func (c *Cmd) Info(ctx context.Context, path string) error {
 }
 
 func (c *Cmd) infoChart(ctx context.Context, chartConfig config.Chart) error {
-	chartRoot, err := c.openChartRoot(chartConfig)
-	if err != nil {
-		return err
-	}
-	defer chartRoot.Close()
-
 	fmt.Printf("%s:\n", chartConfig.Path)
 
 	currentChartFilename := "Chart.yaml"
 	var currentChart *repo.ChartVersion
-	if file.Exists(chartRoot, currentChartFilename) {
-		var err error
+	if c.chartRootExists(chartConfig) {
+		chartRoot, err := c.openChartRoot(chartConfig)
+		if err != nil {
+			return err
+		}
+		defer chartRoot.Close()
+
 		currentChart, err = helm.LoadHelmChartVersionFile(chartRoot, currentChartFilename)
 		if err != nil {
 			return fmt.Errorf("error loading chart file %s: %w\n", currentChartFilename, err)
@@ -48,9 +46,13 @@ func (c *Cmd) infoChart(ctx context.Context, chartConfig config.Chart) error {
 	if err != nil {
 		return err
 	}
-	fmt.Printf("- description: %s\n", latestChart.Chart().Description)
+	if latestChart.Chart().Description != "" {
+		fmt.Printf("- description: %s\n", latestChart.Chart().Description)
+	}
 	if currentChart != nil {
 		fmt.Printf("- local: %s\n", currentChart.Version)
+	} else {
+		fmt.Printf("- local: not found\n")
 	}
 	fmt.Printf("- latest: %s\n", helm.GetChartVersion(latestChart.Chart()))
 	fmt.Printf("- versions:\n")

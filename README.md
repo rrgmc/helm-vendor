@@ -9,7 +9,9 @@ Features:
 - when upgrading charts, the chart of the current version is downloaded, and only the files contained in it are deleted
   locally, before unpacking the new version. This ensures any new file added manually will be kept.
 - Optionally a diff can be made of any local changes in relation to the original chart, and the patch applied on 
-  the new version during upgrade. 
+  the new version during upgrade.
+- OCI repository support, but it don't have native version querying and listing, so only fetching and upgrading
+  is possible.
 
 ## Install
 
@@ -49,6 +51,10 @@ charts:
     repository:
       url: https://go.temporal.io/helm-charts/
     name: temporal
+  - path: strimzi-kafka-operator
+    repository:
+      url: oci://quay.io/strimzi-helm/
+    name: strimzi-kafka-operator
 ```
 
 ```shell
@@ -70,17 +76,17 @@ opentelemetry-collector:
 - local: 0.136.1
 - latest: 0.136.1
 - versions:
-	- 0.136.1 [2025-09-26]
-	- 0.136.0 [2025-09-26]
-	- 0.135.1 [2025-09-25]
-	- 0.135.0 [2025-09-25]
-	- 0.134.1 [2025-09-23]
-	- 0.134.0 [2025-09-15]
-	- 0.133.1 [2025-09-15]
-	- 0.133.0 [2025-09-08]
-	- 0.132.0 [2025-08-27]
-	- 0.131.0 [2025-08-20]
-	
+    - 0.136.1 [2025-09-26]
+    - 0.136.0 [2025-09-26]
+    - 0.135.1 [2025-09-25]
+    - 0.135.0 [2025-09-25]
+    - 0.134.1 [2025-09-23]
+    - 0.134.0 [2025-09-15]
+    - 0.133.1 [2025-09-15]
+    - 0.133.0 [2025-09-08]
+    - 0.132.0 [2025-08-27]
+    - 0.131.0 [2025-08-20]
+    
 $ helm-vendor upgrade opentelemetry-collector
 # Would upgrade opentelemetry-collector to the latest version.
 ```

@@ -32,7 +32,7 @@ func run(ctx context.Context) error {
 		Commands: []*cli.Command{
 			{
 				Name:  "info",
-				Usage: "show chart information and versioning",
+				Usage: "Show chart information and versioning",
 				Action: func(ctx context.Context, command *cli.Command) error {
 					c, err := newCmd(command)
 					if err != nil {
@@ -49,7 +49,7 @@ func run(ctx context.Context) error {
 			},
 			{
 				Name:  "fetch",
-				Usage: "fetch new charts. If the chart was already fetched, use the 'upgrade' command",
+				Usage: "Fetch new charts. If the chart was already fetched, use the 'upgrade' command",
 				Flags: []cli.Flag{
 					&cli.BoolFlag{
 						Name:    "all",
@@ -81,7 +81,8 @@ func run(ctx context.Context) error {
 				},
 			},
 			{
-				Name: "upgrade",
+				Name:  "upgrade",
+				Usage: "Upgrade a chart to a new version",
 				Flags: []cli.Flag{
 					&cli.BoolFlag{
 						Name:  "ignore-current",

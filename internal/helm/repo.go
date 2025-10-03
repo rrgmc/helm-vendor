@@ -1,7 +1,6 @@
 package helm
 
 import (
-	"errors"
 	"fmt"
 	"iter"
 	"os"
@@ -103,7 +102,7 @@ func (r *Repository) GetChart(name, version string) (*Chart, error) {
 				Name:    name,
 				Version: version,
 			},
-			URLs: []string{fmt.Sprintf("%s/%s", strings.TrimSuffix(strings.TrimSpace(r.repository.Config.URL), "/"), name)},
+			URLs: []string{JoinHTTPPaths(r.repository.Config.URL, name)},
 		})
 
 		// return nil, errors.New("cannot get chart from OCI registry")
@@ -141,8 +140,30 @@ func (r *Repository) ChartVersions(name string, maxAmount int) iter.Seq2[*repo.C
 
 func (r *Repository) chartVersionsOCI(name string, maxAmount int) iter.Seq2[*repo.ChartVersion, error] {
 	return func(yield func(*repo.ChartVersion, error) bool) {
-		if r.index == nil {
-			yield(nil, errors.New("cannot list chart from OCI registry"))
+		// if r.index == nil {
+		// 	yield(nil, errors.New("cannot list chart from OCI registry"))
+		// }
+
+		ref := strings.TrimPrefix(JoinHTTPPaths(r.repository.Config.URL, name), fmt.Sprintf("%s://", registry.OCIScheme))
+		tags, err := r.registry.Tags(ref)
+		if err != nil {
+			yield(nil, fmt.Errorf("error getting tags for chart %s: %w", name, err))
+			return
+		}
+		var ct int
+		for _, entry := range tags {
+			if !yield(&repo.ChartVersion{
+				Metadata: &chart.Metadata{
+					Name:    name,
+					Version: entry,
+				},
+			}, nil) {
+				return
+			}
+			ct++
+			if maxAmount > 0 && ct >= maxAmount {
+				return
+			}
 		}
 	}
 }

@@ -59,7 +59,11 @@ func (c *Cmd) infoChart(ctx context.Context, chartConfig config.Chart) error {
 			fmt.Printf("error listing chart versions: %s\n", err)
 			break
 		}
-		fmt.Printf("\t- %s [%s]\n", entry.Version, entry.Created.Format(time.DateOnly))
+		var date string
+		if !entry.Created.IsZero() {
+			date = fmt.Sprintf(" [%s]", entry.Created.Format(time.RFC3339))
+		}
+		fmt.Printf("\t- %s%s\n", entry.Version, date)
 	}
 
 	return nil

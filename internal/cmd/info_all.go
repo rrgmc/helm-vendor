@@ -10,21 +10,21 @@ import (
 	"helm.sh/helm/v3/pkg/repo"
 )
 
-func (c *Cmd) CheckAll(ctx context.Context) error {
+func (c *Cmd) InfoAll(ctx context.Context) error {
 	for _, chartConfig := range c.cfg.Charts {
 		if !c.chartRootExists(chartConfig) {
 			fmt.Printf("- %s: not found\n", chartConfig.Path)
 			continue
 		}
-		err := c.runCheckAll(ctx, chartConfig)
+		err := c.runInfoAll(ctx, chartConfig)
 		if err != nil {
-			fmt.Printf("error checking chart: %s\n", err)
+			fmt.Printf("error getting chart info: %s\n", err)
 		}
 	}
 	return nil
 }
 
-func (c *Cmd) runCheckAll(ctx context.Context, chartConfig config.Chart) error {
+func (c *Cmd) runInfoAll(ctx context.Context, chartConfig config.Chart) error {
 	chartRoot, err := c.openChartRoot(chartConfig)
 	if err != nil {
 		return err

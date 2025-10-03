@@ -21,6 +21,7 @@ func main() {
 
 func run(ctx context.Context) error {
 	commands := &cli.Command{
+		Usage: "Helm vendoring utilities",
 		Flags: []cli.Flag{
 			&cli.StringFlag{
 				Name:    "config-file",
@@ -30,7 +31,8 @@ func run(ctx context.Context) error {
 		},
 		Commands: []*cli.Command{
 			{
-				Name: "check",
+				Name:  "info",
+				Usage: "show chart information and versioning",
 				Action: func(ctx context.Context, command *cli.Command) error {
 					c, err := newCmd(command)
 					if err != nil {
@@ -39,18 +41,20 @@ func run(ctx context.Context) error {
 					defer c.Close()
 
 					if command.NArg() < 1 {
-						return c.CheckAll(ctx)
+						return c.InfoAll(ctx)
 					}
 
-					return c.Check(ctx, command.Args().First())
+					return c.Info(ctx, command.Args().First())
 				},
 			},
 			{
-				Name: "fetch",
+				Name:  "fetch",
+				Usage: "fetch new charts. If the chart was already fetched, use the 'upgrade' command",
 				Flags: []cli.Flag{
 					&cli.BoolFlag{
 						Name:    "all",
 						Aliases: []string{"a"},
+						Usage:   "fetch all pending charts",
 						Value:   false,
 					},
 				},

@@ -11,16 +11,16 @@ import (
 	"helm.sh/helm/v3/pkg/repo"
 )
 
-func (c *Cmd) Check(ctx context.Context, path string) error {
+func (c *Cmd) Info(ctx context.Context, path string) error {
 	for _, chartConfig := range c.cfg.Charts {
 		if path == chartConfig.Path {
-			return c.checkChart(ctx, chartConfig)
+			return c.infoChart(ctx, chartConfig)
 		}
 	}
 	return fmt.Errorf("unknown path '%s'", path)
 }
 
-func (c *Cmd) checkChart(ctx context.Context, chartConfig config.Chart) error {
+func (c *Cmd) infoChart(ctx context.Context, chartConfig config.Chart) error {
 	chartRoot, err := c.openChartRoot(chartConfig)
 	if err != nil {
 		return err

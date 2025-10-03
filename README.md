@@ -58,13 +58,13 @@ Downloading "datadog"...
 Downloading "argo-cd"...
 Downloading "temporal-cluster"...
 
-$ helm-vendor check
+$ helm-vendor info
 - opentelemetry-collector: [local:0.136.1] [latest:0.136.1]
 - datadog: [local:3.135.4] [latest:3.135.4]
 - argo-cd: [local:8.5.8] [latest:8.5.8]
 - temporal-cluster: [local:0.67.0] [latest:0.67.0]
 
-$ helm-vendor check opentelemetry-collector
+$ helm-vendor info opentelemetry-collector
 opentelemetry-collector:
 - description: OpenTelemetry Collector Helm chart for Kubernetes
 - local: 0.136.1

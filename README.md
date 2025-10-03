@@ -13,8 +13,8 @@ Features:
 
 ## Install
 
-Get an executable from the [releases](https://github.com/rrgmc/helm-vendor/releases) or if you have a Go 1.25 compiler
-available:
+Get an executable from the [releases](https://github.com/rrgmc/helm-vendor/releases) page, or if you have a 
+Go 1.25 compiler available:
 
 ```shell
 go install github.com/rrgmc/helm-vendor@latest

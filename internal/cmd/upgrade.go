@@ -80,6 +80,7 @@ func (c *Cmd) upgradeChart(ctx context.Context, chartConfig config.Chart, versio
 
 		sourceChartFiles, err := sourceChart.Download()
 		if err != nil {
+			fmt.Printf("could not download source files, might use the '--ignore-current' flag to ignore it\n")
 			return err
 		}
 		defer sourceChartFiles.Close()

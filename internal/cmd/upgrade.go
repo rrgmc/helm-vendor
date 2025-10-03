@@ -14,7 +14,6 @@ import (
 	"github.com/rrgmc/helm-vendor/internal/diff"
 	"github.com/rrgmc/helm-vendor/internal/file"
 	"github.com/rrgmc/helm-vendor/internal/helm"
-	"helm.sh/helm/v3/pkg/registry"
 )
 
 func (c *Cmd) Upgrade(ctx context.Context, path string, version string, ignoreCurrent bool, applyPatch bool) error {
@@ -44,10 +43,6 @@ func (c *Cmd) upgradeChart(ctx context.Context, chartConfig config.Chart, versio
 		return fmt.Errorf("error loading current chart version file: %w", err)
 	}
 
-	if registry.IsOCI(chartConfig.Repository.URL) {
-
-	}
-
 	repo, err := helm.LoadRepository(chartConfig.Repository.URL)
 	if err != nil {
 		return err
@@ -59,7 +54,7 @@ func (c *Cmd) upgradeChart(ctx context.Context, chartConfig config.Chart, versio
 		return err
 	}
 
-	fmt.Printf("Downloading new version of '%s' [%s - %s]\n", chartConfig.Path, latestChart.Chart().Name, latestChart.Chart().Version)
+	fmt.Printf("Downloading new version of '%s' [%s - %s]\n", chartConfig.Path, latestChart.Chart().Name, helm.GetChartVersion(latestChart.Chart()))
 
 	latestChartFiles, err := latestChart.Download()
 	if err != nil {
@@ -76,7 +71,7 @@ func (c *Cmd) upgradeChart(ctx context.Context, chartConfig config.Chart, versio
 	diffBuilder := diff.NewBuilder(!ignoreCurrent)
 
 	if !ignoreCurrent {
-		fmt.Printf("Downloading source chart for local version [%s - %s]\n", currentChartVersionFile.Name, currentChartVersionFile.Version)
+		fmt.Printf("Downloading source chart for local version [%s - %s]\n", currentChartVersionFile.Name, helm.GetChartVersion(currentChartVersionFile))
 
 		sourceChart, err := repo.GetChart(currentChartVersionFile.Name, currentChartVersionFile.Version)
 		if err != nil {
@@ -199,7 +194,6 @@ func (c *Cmd) upgradeChart(ctx context.Context, chartConfig config.Chart, versio
 					} else {
 						fmt.Printf("could not write conflict patch to %s: file exists\n", conflictFileName)
 					}
-
 				} else {
 					fmt.Printf("failed to apply patch to %s: %s\n", filediff.NewName, err)
 				}

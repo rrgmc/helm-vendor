@@ -47,7 +47,24 @@ func run(ctx context.Context) error {
 			},
 			{
 				Name: "fetch",
+				Flags: []cli.Flag{
+					&cli.BoolFlag{
+						Name:    "all",
+						Aliases: []string{"a"},
+						Value:   false,
+					},
+				},
 				Action: func(ctx context.Context, command *cli.Command) error {
+					c, err := newCmd(command)
+					if err != nil {
+						return err
+					}
+					defer c.Close()
+
+					if command.Bool("all") {
+						return c.FetchAll(ctx)
+					}
+
 					if command.NArg() < 1 {
 						return errors.New("path name is required")
 					}
@@ -56,25 +73,7 @@ func run(ctx context.Context) error {
 						version = command.Args().Get(1)
 					}
 
-					c, err := newCmd(command)
-					if err != nil {
-						return err
-					}
-					defer c.Close()
-
 					return c.Fetch(ctx, command.Args().First(), version)
-				},
-			},
-			{
-				Name: "fetch-all",
-				Action: func(ctx context.Context, command *cli.Command) error {
-					c, err := newCmd(command)
-					if err != nil {
-						return err
-					}
-					defer c.Close()
-
-					return c.FetchAll(ctx)
 				},
 			},
 			{

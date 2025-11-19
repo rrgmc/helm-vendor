@@ -98,6 +98,10 @@ func run(ctx context.Context) error {
 						Value: false,
 					},
 					&cli.StringFlag{
+						Name:  "latest-chart-path",
+						Usage: "extract the latest chart in this path instead of a temporary",
+					},
+					&cli.StringFlag{
 						Name:  "current-chart-path",
 						Usage: "extract the current chart in this path instead of a temporary",
 					},
@@ -118,7 +122,7 @@ func run(ctx context.Context) error {
 					defer c.Close()
 
 					return c.Upgrade(ctx, command.Args().First(), version, command.Bool("ignore-current"), command.Bool("apply-patch"),
-						command.String("current-chart-path"))
+						command.String("latest-chart-path"), command.String("current-chart-path"))
 				},
 			},
 		},

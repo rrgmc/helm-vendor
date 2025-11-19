@@ -20,18 +20,18 @@ import (
 )
 
 func (c *Cmd) Upgrade(ctx context.Context, path string, version string, ignoreCurrent bool, applyPatch bool,
-	currentChartOutputPath string) error {
+	latestChartOutputPath string, currentChartOutputPath string) error {
 	for _, chartConfig := range c.cfg.Charts {
 		if path == chartConfig.Path {
 			return c.upgradeChart(ctx, chartConfig, version, ignoreCurrent, applyPatch,
-				currentChartOutputPath)
+				latestChartOutputPath, currentChartOutputPath)
 		}
 	}
 	return fmt.Errorf("unknown path '%s'", path)
 }
 
 func (c *Cmd) upgradeChart(ctx context.Context, chartConfig config.Chart, version string, ignoreCurrent bool, applyPatch bool,
-	currentChartOutputPath string) error {
+	latestChartOutputPath string, currentChartOutputPath string) error {
 	chartRoot, err := c.openChartRoot(chartConfig)
 	if err != nil {
 		return err
@@ -62,7 +62,12 @@ func (c *Cmd) upgradeChart(ctx context.Context, chartConfig config.Chart, versio
 
 	fmt.Printf("Downloading new version of '%s' [%s - %s]\n", chartConfig.Path, latestChart.Chart().Name, helm.GetChartVersion(latestChart.Chart()))
 
-	latestChartFiles, err := latestChart.Download()
+	var lcDownloadOptions []helm.ChartDownloadOption
+	if latestChartOutputPath != "" {
+		lcDownloadOptions = append(lcDownloadOptions, helm.WithChartDownloadPath(latestChartOutputPath))
+	}
+
+	latestChartFiles, err := latestChart.Download(lcDownloadOptions...)
 	if err != nil {
 		return err
 	}

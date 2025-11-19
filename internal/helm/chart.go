@@ -52,6 +52,11 @@ func (c *Chart) Download(options ...ChartDownloadOption) (*ChartFiles, error) {
 			return nil, fmt.Errorf("unable to create temporary directory for download: %w", err)
 		}
 		isTempPath = true
+	} else {
+		err = os.MkdirAll(optns.downloadPath, 0755)
+		if err != nil {
+			return nil, fmt.Errorf("unable to create output directory for download: %w", err)
+		}
 	}
 
 	dl := downloader.ChartDownloader{

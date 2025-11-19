@@ -19,16 +19,19 @@ import (
 	"github.com/rrgmc/helm-vendor/internal/helm"
 )
 
-func (c *Cmd) Upgrade(ctx context.Context, path string, version string, ignoreCurrent bool, applyPatch bool) error {
+func (c *Cmd) Upgrade(ctx context.Context, path string, version string, ignoreCurrent bool, applyPatch bool,
+	currentChartOutputPath string) error {
 	for _, chartConfig := range c.cfg.Charts {
 		if path == chartConfig.Path {
-			return c.upgradeChart(ctx, chartConfig, version, ignoreCurrent, applyPatch)
+			return c.upgradeChart(ctx, chartConfig, version, ignoreCurrent, applyPatch,
+				currentChartOutputPath)
 		}
 	}
 	return fmt.Errorf("unknown path '%s'", path)
 }
 
-func (c *Cmd) upgradeChart(ctx context.Context, chartConfig config.Chart, version string, ignoreCurrent bool, applyPatch bool) error {
+func (c *Cmd) upgradeChart(ctx context.Context, chartConfig config.Chart, version string, ignoreCurrent bool, applyPatch bool,
+	currentChartOutputPath string) error {
 	chartRoot, err := c.openChartRoot(chartConfig)
 	if err != nil {
 		return err
@@ -81,7 +84,12 @@ func (c *Cmd) upgradeChart(ctx context.Context, chartConfig config.Chart, versio
 			return err
 		}
 
-		sourceChartFiles, err := sourceChart.Download()
+		var scDownloadOptions []helm.ChartDownloadOption
+		if currentChartOutputPath != "" {
+			scDownloadOptions = append(scDownloadOptions, helm.WithChartDownloadPath(currentChartOutputPath))
+		}
+
+		sourceChartFiles, err := sourceChart.Download(scDownloadOptions...)
 		if err != nil {
 			fmt.Printf("could not download source files, might use the '--ignore-current' flag to ignore it\n")
 			return err

@@ -97,6 +97,10 @@ func run(ctx context.Context) error {
 						Usage: "create a diff of the local version and the chart of the same version, and patch the new version with it",
 						Value: false,
 					},
+					&cli.StringFlag{
+						Name:  "current-chart-path",
+						Usage: "extract the current chart in this path instead of a temporary",
+					},
 				},
 				Action: func(ctx context.Context, command *cli.Command) error {
 					if command.NArg() < 1 {
@@ -113,7 +117,8 @@ func run(ctx context.Context) error {
 					}
 					defer c.Close()
 
-					return c.Upgrade(ctx, command.Args().First(), version, command.Bool("ignore-current"), command.Bool("apply-patch"))
+					return c.Upgrade(ctx, command.Args().First(), version, command.Bool("ignore-current"), command.Bool("apply-patch"),
+						command.String("current-chart-path"))
 				},
 			},
 		},

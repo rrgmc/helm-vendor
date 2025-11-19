@@ -35,6 +35,29 @@ func (b *Builder) Add(sourcePath, destPath string, sourceFS, destFS *os.Root, so
 		return err
 	}
 
+	return b.AddData(sourcePath, destPath, sourceFileData, destFileData)
+}
+
+func (b *Builder) AddLocal(destPath string, destFS *os.Root, destFile string) error {
+	if !b.diffEnabled {
+		return nil
+	}
+
+	destFileData, err := destFS.ReadFile(destFile)
+	if errors.Is(err, fs.ErrNotExist) {
+		destFileData = []byte("")
+	} else if err != nil {
+		return err
+	}
+
+	return b.AddData(destPath, destPath, nil, destFileData)
+}
+
+func (b *Builder) AddData(sourcePath, destPath string, sourceFileData, destFileData []byte) error {
+	if !b.diffEnabled {
+		return nil
+	}
+
 	// get a diff of the files
 	edits := udiff.Bytes(sourceFileData, destFileData)
 	if len(edits) > 0 {

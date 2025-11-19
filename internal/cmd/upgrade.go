@@ -7,7 +7,10 @@ import (
 	"fmt"
 	"io/fs"
 	"os"
+	"path"
 	"path/filepath"
+	"slices"
+	"strings"
 
 	"github.com/bluekeyes/go-gitdiff/gitdiff"
 	"github.com/rrgmc/helm-vendor/internal/config"
@@ -85,6 +88,8 @@ func (c *Cmd) upgradeChart(ctx context.Context, chartConfig config.Chart, versio
 		}
 		defer sourceChartFiles.Close()
 
+		sourceChartPaths := map[string][]string{}
+
 		// take diff of local code and chart code from the current version.
 		for sourceChartFile, err := range chartFileIter(sourceChartFiles.Iter()) {
 			if err != nil {
@@ -94,11 +99,38 @@ func (c *Cmd) upgradeChart(ctx context.Context, chartConfig config.Chart, versio
 				continue
 			}
 
+			if strings.Contains(sourceChartFile.Path, "/") {
+				sdir := path.Dir(sourceChartFile.Path)
+				sourceChartPaths[sdir] = append(sourceChartPaths[sdir], sourceChartFile.Path)
+			}
+
 			err = diffBuilder.Add(sourceChartFile.Path, sourceChartFile.Path, sourceChartFiles.Root(), chartRoot,
 				sourceChartFile.Path, sourceChartFile.Path)
 			if err != nil {
 				return err
 			}
+		}
+
+		// find new local files
+		walkErr := fs.WalkDir(chartRoot.FS(), ".", func(p string, d fs.DirEntry, err error) error {
+			if d.IsDir() {
+				return nil
+			}
+			if strings.Contains(p, "/") {
+				sdir := path.Dir(p)
+				if sp, ok := sourceChartPaths[sdir]; ok {
+					if !slices.Contains(sp, p) {
+						err = diffBuilder.AddLocal(p, chartRoot, p)
+						if err != nil {
+							return err
+						}
+					}
+				}
+			}
+			return nil
+		})
+		if walkErr != nil {
+			return walkErr
 		}
 
 		// write diff

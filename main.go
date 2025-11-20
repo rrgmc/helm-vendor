@@ -125,6 +125,27 @@ func run(ctx context.Context) error {
 						command.String("latest-chart-path"), command.String("current-chart-path"))
 				},
 			},
+			{
+				Name:      "download",
+				Usage:     "Download a chart directly from a repository",
+				UsageText: "helm-vendor download repoURL chartName [version]",
+				Flags: []cli.Flag{
+					&cli.StringFlag{
+						Name:  "output-path",
+						Usage: "output path to write the chart files. If empty, will only output the chart info",
+					},
+				},
+				Action: func(ctx context.Context, command *cli.Command) error {
+					if command.NArg() < 2 {
+						return errors.New("repo URL and chart name is required")
+					}
+					var version string
+					if command.NArg() > 2 {
+						version = command.Args().Get(2)
+					}
+					return cmd.Download(ctx, command.Args().First(), command.Args().Get(1), version, command.String("output-path"))
+				},
+			},
 		},
 	}
 

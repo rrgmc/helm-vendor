@@ -34,6 +34,14 @@ func run(ctx context.Context) error {
 				Name:      "info",
 				Usage:     "Show chart information and versioning",
 				UsageText: "helm-vendor info [options] [path]",
+				Flags: []cli.Flag{
+					&cli.BoolFlag{
+						Name:    "all-versions",
+						Aliases: []string{"a"},
+						Usage:   "shows all chart versions",
+						Value:   false,
+					},
+				},
 				Action: func(ctx context.Context, command *cli.Command) error {
 					c, err := newCmd(command)
 					if err != nil {
@@ -45,7 +53,7 @@ func run(ctx context.Context) error {
 						return c.InfoAll(ctx)
 					}
 
-					return c.Info(ctx, command.Args().First())
+					return c.Info(ctx, command.Args().First(), command.Bool("all-versions"))
 				},
 			},
 			{

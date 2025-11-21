@@ -10,16 +10,16 @@ import (
 	"helm.sh/helm/v3/pkg/repo"
 )
 
-func (c *Cmd) Info(ctx context.Context, path string) error {
+func (c *Cmd) Info(ctx context.Context, path string, allVersions bool) error {
 	for _, chartConfig := range c.cfg.Charts {
 		if path == chartConfig.Path {
-			return c.infoChart(ctx, chartConfig)
+			return c.infoChart(ctx, chartConfig, allVersions)
 		}
 	}
 	return fmt.Errorf("unknown path '%s'", path)
 }
 
-func (c *Cmd) infoChart(ctx context.Context, chartConfig config.Chart) error {
+func (c *Cmd) infoChart(ctx context.Context, chartConfig config.Chart, allVersions bool) error {
 	fmt.Printf("%s:\n", chartConfig.Path)
 
 	currentChartFilename := "Chart.yaml"
@@ -56,7 +56,11 @@ func (c *Cmd) infoChart(ctx context.Context, chartConfig config.Chart) error {
 	}
 	fmt.Printf("- latest: %s\n", helm.GetChartVersion(latestChart.Chart()))
 	fmt.Printf("- versions:\n")
-	for entry, err := range repository.ChartVersions(chartConfig.Name, 10) {
+	maxVersions := 10
+	if allVersions {
+		maxVersions = -1
+	}
+	for entry, err := range repository.ChartVersions(chartConfig.Name, maxVersions) {
 		if err != nil {
 			fmt.Printf("error listing chart versions: %s\n", err)
 			break

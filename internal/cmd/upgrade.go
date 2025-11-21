@@ -175,7 +175,9 @@ func (c *Cmd) upgradeChart(ctx context.Context, chartConfig config.Chart, versio
 			}
 			err = chartRoot.Remove(fi.Path)
 			if err != nil {
-				return err
+				if !errors.Is(err, fs.ErrNotExist) {
+					return err
+				}
 			}
 		}
 	}

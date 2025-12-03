@@ -18,6 +18,15 @@ func LoadHelmChartVersion(r io.Reader) (*repo.ChartVersion, error) {
 	return &chart, nil
 }
 
+func LoadHelmChartVersionFilename(filename string) (*repo.ChartVersion, error) {
+	f, err := os.Open(filename)
+	if err != nil {
+		return nil, err
+	}
+	defer f.Close()
+	return LoadHelmChartVersion(f)
+}
+
 func LoadHelmChartVersionFile(root *os.Root, filename string) (*repo.ChartVersion, error) {
 	var chart repo.ChartVersion
 	if err := yaml.DecodeFile(root, filename, &chart); err != nil {

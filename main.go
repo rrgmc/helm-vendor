@@ -154,6 +154,18 @@ func run(ctx context.Context) error {
 					return cmd.Download(ctx, command.Args().First(), command.Args().Get(1), version, command.String("output-path"))
 				},
 			},
+			{
+				Name:      "dependency",
+				Usage:     "dependency",
+				UsageText: "helm-vendor dependency",
+				Action: func(ctx context.Context, command *cli.Command) error {
+					path, err := os.Getwd()
+					if err != nil {
+						return err
+					}
+					return cmd.Dependency(ctx, path)
+				},
+			},
 		},
 	}
 

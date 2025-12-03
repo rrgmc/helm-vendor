@@ -24,7 +24,11 @@ func Download(ctx context.Context, repoURL string, name string, version string, 
 	if latestChart.Chart().Description != "" {
 		fmt.Printf("- description: %s\n", latestChart.Chart().Description)
 	}
-	fmt.Printf("- latest: %s\n", helm.GetChartVersion(latestChart.Chart()))
+	if version == "" {
+		fmt.Printf("- latest: %s\n", helm.GetChartVersion(latestChart.Chart()))
+	} else {
+		fmt.Printf("- requested version: %s\n", helm.GetChartVersion(latestChart.Chart()))
+	}
 	fmt.Printf("- versions:\n")
 	for entry, err := range repo.ChartVersions(name, 15) {
 		if err != nil {

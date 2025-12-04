@@ -8,7 +8,7 @@ import (
 	"github.com/rrgmc/helm-vendor/internal/helm"
 )
 
-func Download(ctx context.Context, repoURL string, name string, version string, outputPath string) error {
+func Download(ctx context.Context, repoURL string, name string, version string, allVersions bool, outputPath string) error {
 	repo, err := helm.LoadRepository(repoURL)
 	if err != nil {
 		return err
@@ -30,7 +30,11 @@ func Download(ctx context.Context, repoURL string, name string, version string, 
 		fmt.Printf("- requested version: %s\n", helm.GetChartVersion(latestChart.Chart()))
 	}
 	fmt.Printf("- versions:\n")
-	for entry, err := range repo.ChartVersions(name, 15) {
+	maxVersions := 15
+	if allVersions {
+		maxVersions = -1
+	}
+	for entry, err := range repo.ChartVersions(name, maxVersions) {
 		if err != nil {
 			fmt.Printf("error listing chart versions: %s\n", err)
 			break

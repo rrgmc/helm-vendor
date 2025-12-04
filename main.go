@@ -138,6 +138,12 @@ func run(ctx context.Context) error {
 				Usage:     "Download a chart directly from a repository",
 				UsageText: "helm-vendor download repoURL chartName [version]",
 				Flags: []cli.Flag{
+					&cli.BoolFlag{
+						Name:    "all-versions",
+						Aliases: []string{"a"},
+						Usage:   "shows all chart versions",
+						Value:   false,
+					},
 					&cli.StringFlag{
 						Name:  "output-path",
 						Usage: "output path to write the chart files. If empty, will only output the chart info",
@@ -151,19 +157,28 @@ func run(ctx context.Context) error {
 					if command.NArg() > 2 {
 						version = command.Args().Get(2)
 					}
-					return cmd.Download(ctx, command.Args().First(), command.Args().Get(1), version, command.String("output-path"))
+					return cmd.Download(ctx, command.Args().First(), command.Args().Get(1), version,
+						command.Bool("all-versions"), command.String("output-path"))
 				},
 			},
 			{
 				Name:      "dependency",
 				Usage:     "dependency",
 				UsageText: "helm-vendor dependency",
+				Flags: []cli.Flag{
+					&cli.BoolFlag{
+						Name:    "all-versions",
+						Aliases: []string{"a"},
+						Usage:   "shows all chart versions",
+						Value:   false,
+					},
+				},
 				Action: func(ctx context.Context, command *cli.Command) error {
 					path, err := os.Getwd()
 					if err != nil {
 						return err
 					}
-					return cmd.Dependency(ctx, path)
+					return cmd.Dependency(ctx, path, command.Bool("all-versions"))
 				},
 			},
 		},

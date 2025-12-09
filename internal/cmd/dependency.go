@@ -142,7 +142,7 @@ func DependencyDiff(ctx context.Context, path string, valueFiles []string, showD
 
 		if showDiff && !isEquals {
 			if !exists {
-				fmt.Printf("DIFF[NE]: %s = '%v'\n", pathOutput, value)
+				fmt.Printf("DIFF[NE]: %s = '%v' [NOTEXISTS]\n", pathOutput, value)
 			} else {
 				fmt.Printf("DIFF: %s = '%v' [was: '%v']\n", pathOutput, value, otherValue)
 			}

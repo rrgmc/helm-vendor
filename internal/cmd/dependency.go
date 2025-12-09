@@ -126,7 +126,7 @@ func DependencyDiff(ctx context.Context, path string, showDiff, showEquals bool,
 		isEquals := exists && cmp.Equal(value, otherValue)
 
 		if showDiff && !isEquals {
-			fmt.Printf("DIFF: %s = '%v [%v]'\n", pathOutput, value, otherValue)
+			fmt.Printf("DIFF: %s = '%v' [was: '%v']\n", pathOutput, value, otherValue)
 		}
 		if showEquals && isEquals {
 			fmt.Printf("EQUALS: %s = '%v'\n", pathOutput, value)

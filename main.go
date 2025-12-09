@@ -181,6 +181,26 @@ func run(ctx context.Context) error {
 					return cmd.Dependency(ctx, path, command.Bool("all-versions"))
 				},
 			},
+			{
+				Name:      "dependency-diff",
+				Usage:     "dependency-diff",
+				UsageText: "helm-vendor dependency diff",
+				Flags:     []cli.Flag{
+					// &cli.BoolFlag{
+					// 	Name:    "all-versions",
+					// 	Aliases: []string{"a"},
+					// 	Usage:   "shows all chart versions",
+					// 	Value:   false,
+					// },
+				},
+				Action: func(ctx context.Context, command *cli.Command) error {
+					path, err := os.Getwd()
+					if err != nil {
+						return err
+					}
+					return cmd.DependencyDiff(ctx, path)
+				},
+			},
 		},
 	}
 

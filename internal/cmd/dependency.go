@@ -36,7 +36,7 @@ func Dependency(ctx context.Context, path string, allVersions bool) error {
 	return nil
 }
 
-func DependencyDiff(ctx context.Context, path string, showDiff, showEquals bool, ignoreKeys []string) error {
+func DependencyDiff(ctx context.Context, path string, valueFiles []string, showDiff, showEquals bool, ignoreKeys []string) error {
 	values := chartutil.Values{}
 	var valuesErr error
 
@@ -64,6 +64,21 @@ func DependencyDiff(ctx context.Context, path string, showDiff, showEquals bool,
 	}
 	if valuesErr != nil {
 		return valuesErr
+	}
+
+	for _, valueFile := range valueFiles {
+		currentMap := map[string]interface{}{}
+
+		bytes, err := os.ReadFile(valueFile)
+		if err != nil {
+			return err
+		}
+
+		if err := yaml.Unmarshal(bytes, &currentMap); err != nil {
+			return fmt.Errorf("failed to parse %s: %w", valueFile, err)
+		}
+		// Merge with the previous map
+		chartutil.CoalesceTables(values, currentMap)
 	}
 
 	emptyValues := chartutil.Values{}
@@ -127,18 +142,14 @@ func DependencyDiff(ctx context.Context, path string, showDiff, showEquals bool,
 
 		if showDiff && !isEquals {
 			if !exists {
-				otherValue = "[NOT EXISTS]"
+				fmt.Printf("DIFF[NE]: %s = '%v'\n", pathOutput, value)
+			} else {
+				fmt.Printf("DIFF: %s = '%v' [was: '%v']\n", pathOutput, value, otherValue)
 			}
-
-			fmt.Printf("DIFF: %s = '%v' [was: '%v']\n", pathOutput, value, otherValue)
 		}
 		if showEquals && isEquals {
 			fmt.Printf("EQUALS: %s = '%v'\n", pathOutput, value)
 		}
-
-		// if exists && cmp.Equal(value, otherValue) {
-		// 	fmt.Printf("EQUALS: %s = '%v'\n", pathOutput, value)
-		// }
 	})
 
 	return nil

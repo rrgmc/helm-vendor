@@ -35,7 +35,7 @@ func Dependency(ctx context.Context, path string, allVersions bool) error {
 	return nil
 }
 
-func DependencyDiff(ctx context.Context, path string, ignoreKeys []string) error {
+func DependencyDiff(ctx context.Context, path string, showDiff, showEquals bool, ignoreKeys []string) error {
 	// ignoreKeys := []string{
 	// 	"opentelemetry-collector.config",
 	// }
@@ -118,14 +118,23 @@ func DependencyDiff(ctx context.Context, path string, ignoreKeys []string) error
 		// pathOutput := strings.Join(path, ".")
 		var pathOutput string
 		for _, p := range path {
-			pathOutput += fmt.Sprintf(" [%s]", p)
+			pathOutput += fmt.Sprintf("[%s] ", p)
 		}
 
 		otherValue, exists := findRecursive(defaultValues, path)
 
-		if exists && cmp.Equal(value, otherValue) {
+		isEquals := exists && cmp.Equal(value, otherValue)
+
+		if showDiff && !isEquals {
+			fmt.Printf("DIFF: %s = '%v'\n", pathOutput, value)
+		}
+		if showEquals && isEquals {
 			fmt.Printf("EQUALS: %s = '%v'\n", pathOutput, value)
 		}
+
+		// if exists && cmp.Equal(value, otherValue) {
+		// 	fmt.Printf("EQUALS: %s = '%v'\n", pathOutput, value)
+		// }
 	})
 
 	return nil

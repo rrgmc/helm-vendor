@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	"github.com/google/go-cmp/cmp"
+	"github.com/mitchellh/copystructure"
 	"github.com/rrgmc/helm-vendor/internal/helm"
 	"helm.sh/helm/v3/pkg/chartutil"
 	"sigs.k8s.io/yaml"
@@ -36,10 +37,6 @@ func Dependency(ctx context.Context, path string, allVersions bool) error {
 }
 
 func DependencyDiff(ctx context.Context, path string, showDiff, showEquals bool, ignoreKeys []string) error {
-	// ignoreKeys := []string{
-	// 	"opentelemetry-collector.config",
-	// }
-
 	values := chartutil.Values{}
 	var valuesErr error
 
@@ -55,6 +52,8 @@ func DependencyDiff(ctx context.Context, path string, showDiff, showEquals bool,
 				valuesErr = fmt.Errorf("failed to parse %s: %w", valueFile, err)
 				return false
 			}
+
+			values = trimNilValues(values)
 
 			return false
 		}
@@ -98,6 +97,7 @@ func DependencyDiff(ctx context.Context, path string, showDiff, showEquals bool,
 			depName = dep.Alias
 		}
 		depOptions = append(depOptions, depName)
+		// fmt.Printf("Adding dependency %s [%s]\n", dep.Name, dep.Version)
 	}
 
 	mapIterate(values, func(path []string, value any) {
@@ -126,6 +126,10 @@ func DependencyDiff(ctx context.Context, path string, showDiff, showEquals bool,
 		isEquals := exists && cmp.Equal(value, otherValue)
 
 		if showDiff && !isEquals {
+			if !exists {
+				otherValue = "[NOT EXISTS]"
+			}
+
 			fmt.Printf("DIFF: %s = '%v' [was: '%v']\n", pathOutput, value, otherValue)
 		}
 		if showEquals && isEquals {
@@ -182,4 +186,29 @@ func findRecursive(data map[string]any, path []string) (interface{}, bool) {
 	}
 
 	return nil, false // Key found, but not a map for further recursion
+}
+
+func trimNilValues(vals map[string]interface{}) map[string]interface{} {
+	valsCopy, err := copystructure.Copy(vals)
+	if err != nil {
+		return vals
+	}
+	valsCopyMap := valsCopy.(map[string]interface{})
+	for key, val := range valsCopyMap {
+		if val == nil {
+			// Iterate over the values and remove nil keys
+			delete(valsCopyMap, key)
+		} else if istable(val) {
+			// Recursively call into ourselves to remove keys from inner tables
+			valsCopyMap[key] = trimNilValues(val.(map[string]interface{}))
+		}
+	}
+
+	return valsCopyMap
+}
+
+// istable is a special-purpose function to see if the present thing matches the definition of a YAML table.
+func istable(v interface{}) bool {
+	_, ok := v.(map[string]interface{})
+	return ok
 }

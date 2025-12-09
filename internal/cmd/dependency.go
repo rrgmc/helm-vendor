@@ -110,7 +110,7 @@ func DependencyDiff(ctx context.Context, path string, ignoreKeys []string) error
 
 		pathName := strings.Join(path, ".")
 		for _, ik := range ignoreKeys {
-			if strings.HasPrefix(pathName, ik) {
+			if ik == pathName || strings.HasPrefix(pathName, ik+".") {
 				return
 			}
 		}

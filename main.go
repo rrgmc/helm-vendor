@@ -185,20 +185,19 @@ func run(ctx context.Context) error {
 				Name:      "dependency-diff",
 				Usage:     "dependency-diff",
 				UsageText: "helm-vendor dependency diff",
-				Flags:     []cli.Flag{
-					// &cli.BoolFlag{
-					// 	Name:    "all-versions",
-					// 	Aliases: []string{"a"},
-					// 	Usage:   "shows all chart versions",
-					// 	Value:   false,
-					// },
+				Flags: []cli.Flag{
+					&cli.StringSliceFlag{
+						Name:    "ignore-key",
+						Aliases: []string{"i"},
+						Usage:   "value keys to ignore",
+					},
 				},
 				Action: func(ctx context.Context, command *cli.Command) error {
 					path, err := os.Getwd()
 					if err != nil {
 						return err
 					}
-					return cmd.DependencyDiff(ctx, path)
+					return cmd.DependencyDiff(ctx, path, command.StringSlice("ignore-key"))
 				},
 			},
 		},

@@ -8,6 +8,7 @@ import (
 	"slices"
 	"strings"
 
+	"github.com/google/go-cmp/cmp"
 	"github.com/rrgmc/helm-vendor/internal/helm"
 	"helm.sh/helm/v3/pkg/chartutil"
 	"sigs.k8s.io/yaml"
@@ -34,7 +35,11 @@ func Dependency(ctx context.Context, path string, allVersions bool) error {
 	return nil
 }
 
-func DependencyDiff(ctx context.Context, path string) error {
+func DependencyDiff(ctx context.Context, path string, ignoreKeys []string) error {
+	// ignoreKeys := []string{
+	// 	"opentelemetry-collector.config",
+	// }
+
 	values := chartutil.Values{}
 	var valuesErr error
 
@@ -76,18 +81,46 @@ func DependencyDiff(ctx context.Context, path string) error {
 		IsUpgrade: false,
 	}
 
-	// valuesToRender, err := chartutil.ToRenderValues(chart, emptyValues, releaseOptions, nil)
-	_, err = chartutil.ToRenderValues(chart, emptyValues, releaseOptions, nil)
+	valuesToRender, err := chartutil.ToRenderValues(chart, emptyValues, releaseOptions, nil)
 	if err != nil {
 		return err
 	}
 
-	mapIterate(values, func(path []string, value any) {
-		fmt.Printf("%s : %v\n", strings.Join(path, "."), value)
-	})
+	defaultValues := valuesToRender["Values"].(chartutil.Values)
 
-	// spew.Dump(values)
-	// spew.Dump(valuesToRender)
+	var depOptions []string
+	for _, dep := range chart.Metadata.Dependencies {
+		if dep.Repository == "" {
+			continue
+		}
+		depName := dep.Name
+		if dep.Alias != "" {
+			depName = dep.Alias
+		}
+		depOptions = append(depOptions, depName)
+	}
+
+	mapIterate(values, func(path []string, value any) {
+		if len(path) == 0 {
+			return
+		}
+		if !slices.Contains(depOptions, path[0]) {
+			return
+		}
+
+		pathName := strings.Join(path, ".")
+		for _, ik := range ignoreKeys {
+			if strings.HasPrefix(pathName, ik) {
+				return
+			}
+		}
+
+		otherValue, exists := findRecursive(defaultValues, path)
+
+		if exists && cmp.Equal(value, otherValue) {
+			fmt.Printf("EQUALS: %s = '%v'\n", pathName, value)
+		}
+	})
 
 	return nil
 }

@@ -115,10 +115,16 @@ func DependencyDiff(ctx context.Context, path string, ignoreKeys []string) error
 			}
 		}
 
+		// pathOutput := strings.Join(path, ".")
+		var pathOutput string
+		for _, p := range path {
+			pathOutput += fmt.Sprintf(" [%s]", p)
+		}
+
 		otherValue, exists := findRecursive(defaultValues, path)
 
 		if exists && cmp.Equal(value, otherValue) {
-			fmt.Printf("EQUALS: %s = '%v'\n", pathName, value)
+			fmt.Printf("EQUALS: %s = '%v'\n", pathOutput, value)
 		}
 	})
 

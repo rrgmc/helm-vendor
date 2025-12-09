@@ -130,12 +130,16 @@ func mapIterate(m map[string]any, f func(path []string, value any)) {
 }
 
 func mapIteratePath(m map[string]any, startPath []string, f func(path []string, value any)) {
-	for k, v := range m {
+	for k, v := range helm.MapSortedByKey(m) {
 		currentPath := slices.Concat(startPath, []string{k})
 
 		// If the value is another map, recurse
 		if nextMap, isMap := v.(map[string]any); isMap {
-			mapIteratePath(nextMap, currentPath, f)
+			if len(nextMap) == 0 {
+				f(currentPath, v)
+			} else {
+				mapIteratePath(nextMap, currentPath, f)
+			}
 		} else {
 			f(currentPath, v)
 		}

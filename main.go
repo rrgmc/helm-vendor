@@ -144,9 +144,15 @@ func run(ctx context.Context) error {
 						Usage:   "shows all chart versions",
 						Value:   false,
 					},
+					&cli.BoolFlag{
+						Name:    "output-values-file",
+						Aliases: []string{"v"},
+						Usage:   "output the values file for the named dependency",
+					},
 					&cli.StringFlag{
-						Name:  "output-path",
-						Usage: "output path to write the chart files. If empty, will only output the chart info",
+						Name:    "output-path",
+						Aliases: []string{"o"},
+						Usage:   "output path to write the chart files. If empty, will only output the chart info",
 					},
 				},
 				Action: func(ctx context.Context, command *cli.Command) error {
@@ -158,7 +164,8 @@ func run(ctx context.Context) error {
 						version = command.Args().Get(2)
 					}
 					return cmd.Download(ctx, command.Args().First(), command.Args().Get(1), version,
-						command.Bool("all-versions"), command.String("output-path"))
+						command.Bool("all-versions"), command.Bool("output-values-file"),
+						command.String("output-path"))
 				},
 			},
 			{
@@ -173,12 +180,19 @@ func run(ctx context.Context) error {
 						Value:   false,
 					},
 					&cli.StringFlag{
-						Name:  "output-path",
-						Usage: "output path to write the chart files. If empty, will only output the chart info (only if dependency-name is set)",
+						Name:    "output-path",
+						Aliases: []string{"o"},
+						Usage:   "output path to write the chart files. If empty, will only output the chart info (only if dependency-name is set)",
+					},
+					&cli.BoolFlag{
+						Name:    "output-values-file",
+						Aliases: []string{"v"},
+						Usage:   "output the values file for the named dependency",
 					},
 					&cli.StringFlag{
-						Name:  "name",
-						Usage: "dependency name to check",
+						Name:    "name",
+						Aliases: []string{"n"},
+						Usage:   "dependency name to check",
 					},
 					&cli.StringFlag{
 						Name:  "version",
@@ -191,7 +205,8 @@ func run(ctx context.Context) error {
 						return err
 					}
 					return cmd.Dependency(ctx, path, command.String("name"), command.String("version"),
-						command.Bool("all-versions"), command.String("output-path"))
+						command.Bool("all-versions"), command.Bool("output-values-file"),
+						command.String("output-path"))
 				},
 			},
 			{

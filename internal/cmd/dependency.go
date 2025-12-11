@@ -8,7 +8,8 @@ import (
 	"github.com/rrgmc/helm-vendor/internal/helm"
 )
 
-func Dependency(ctx context.Context, path string, name string, version string, allVersions bool, outputPath string) error {
+func Dependency(ctx context.Context, path string, name string, version string, allVersions bool, outputValuesFile bool,
+	outputPath string) error {
 	currentChartFilename := filepath.Join(path, "Chart.yaml")
 
 	chart, err := helm.LoadHelmChartVersionFilename(currentChartFilename)
@@ -23,19 +24,21 @@ func Dependency(ctx context.Context, path string, name string, version string, a
 		}
 
 		currentVersion := dependency.Version
+		var currentOutputValuesFile bool
 		var currentOutputPath string
 		if isName && version != "" {
 			currentVersion = version
 		}
 		if isName {
 			currentOutputPath = outputPath
+			currentOutputValuesFile = outputValuesFile
 		}
 
 		if !isName && dependency.Repository == "" {
 			continue
 		}
 
-		err = Download(ctx, dependency.Repository, dependency.Name, currentVersion, allVersions, currentOutputPath)
+		err = Download(ctx, dependency.Repository, dependency.Name, currentVersion, allVersions, currentOutputValuesFile, currentOutputPath)
 		if err != nil {
 			return err
 		}

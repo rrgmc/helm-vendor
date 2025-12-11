@@ -184,7 +184,7 @@ func run(ctx context.Context) error {
 			{
 				Name:      "values-diff",
 				Usage:     "values-diff",
-				UsageText: "helm-vendor values diff",
+				UsageText: "helm-vendor values-diff",
 				Flags: []cli.Flag{
 					&cli.StringSliceFlag{
 						Name:    "values",
@@ -215,6 +215,30 @@ func run(ctx context.Context) error {
 					}
 					return cmd.ValuesDiff(ctx, path, command.StringSlice("values"), command.Bool("show-diff"),
 						command.Bool("show-equals"), command.StringSlice("ignore-key"))
+				},
+			},
+			{
+				Name:      "values-render",
+				Usage:     "values-render",
+				UsageText: "helm-vendor values-render",
+				Flags: []cli.Flag{
+					&cli.StringSliceFlag{
+						Name:    "values",
+						Aliases: []string{"f"},
+						Usage:   "extra configuration values file name",
+					},
+					&cli.BoolFlag{
+						Name:    "exclude-root-values",
+						Aliases: []string{"e"},
+						Usage:   "exclude root values file",
+					},
+				},
+				Action: func(ctx context.Context, command *cli.Command) error {
+					path, err := os.Getwd()
+					if err != nil {
+						return err
+					}
+					return cmd.ValuesRender(ctx, path, command.StringSlice("values"), command.Bool("exclude-root-values"))
 				},
 			},
 		},

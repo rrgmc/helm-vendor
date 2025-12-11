@@ -172,13 +172,26 @@ func run(ctx context.Context) error {
 						Usage:   "shows all chart versions",
 						Value:   false,
 					},
+					&cli.StringFlag{
+						Name:  "output-path",
+						Usage: "output path to write the chart files. If empty, will only output the chart info (only if dependency-name is set)",
+					},
+					&cli.StringFlag{
+						Name:  "name",
+						Usage: "dependency name to check",
+					},
+					&cli.StringFlag{
+						Name:  "version",
+						Usage: "allows overriding the dependency version",
+					},
 				},
 				Action: func(ctx context.Context, command *cli.Command) error {
 					path, err := os.Getwd()
 					if err != nil {
 						return err
 					}
-					return cmd.Dependency(ctx, path, command.Bool("all-versions"))
+					return cmd.Dependency(ctx, path, command.String("name"), command.String("version"),
+						command.Bool("all-versions"), command.String("output-path"))
 				},
 			},
 			{

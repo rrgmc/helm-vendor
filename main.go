@@ -182,9 +182,9 @@ func run(ctx context.Context) error {
 				},
 			},
 			{
-				Name:      "dependency-diff",
-				Usage:     "dependency-diff",
-				UsageText: "helm-vendor dependency diff",
+				Name:      "values-diff",
+				Usage:     "values-diff",
+				UsageText: "helm-vendor values diff",
 				Flags: []cli.Flag{
 					&cli.StringSliceFlag{
 						Name:    "values",
@@ -213,7 +213,7 @@ func run(ctx context.Context) error {
 					if err != nil {
 						return err
 					}
-					return cmd.DependencyDiff(ctx, path, command.StringSlice("values"), command.Bool("show-diff"),
+					return cmd.ValuesDiff(ctx, path, command.StringSlice("values"), command.Bool("show-diff"),
 						command.Bool("show-equals"), command.StringSlice("ignore-key"))
 				},
 			},
